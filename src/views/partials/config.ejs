@@ -1,0 +1,197 @@
+<section class="pagina" id="pg-config">
+    <div class="cabecalho-pagina">
+      <div><h1>Configurações</h1>
+        <p><%= portal ? 'Contas de acesso ao portal de ' + portal.nome + '.'
+                      : 'Empresas, sistemas, contas e dados do sistema.' %></p></div>
+    </div>
+    <div class="config-grid">
+      <aside class="config-menu cartao" id="menuConfig">
+        <%# sistemas agora são cadastrados dentro da empresa %>
+        <% if (usuario.perfil === 'admin') { %>
+        <button data-sec="empresas" class="ativo"><span>🏢</span> Empresas e sistemas</button>
+        <% } %>
+        <% if (pode['usuario.administrar']) { %>
+        <button data-sec="usuarios" <%= portal ? 'class="ativo"' : '' %>><span>👤</span> Usuários</button>
+        <% } %>
+        <% if (pode['perfil.administrar']) { %>
+        <button data-sec="perfis"><span>🛡️</span> Perfis e permissões</button>
+        <% } %>
+        <% if (usuario.perfil === 'admin') { %>
+        <button data-sec="listas"><span>≡</span> Catálogos</button>
+        <button data-sec="identidade"><span>#</span> Identificação</button>
+        <% } %>
+        <% if (!portal) { %>
+        <button data-sec="dados"><span>⛃</span> Dados e backup</button>
+        <% } %>
+      </aside>
+
+      <div>
+        <% if (usuario.perfil === 'admin') { %>
+        <!-- Catálogos gerais (sem sistemas: esses ficam na empresa) -->
+        <section class="config-sec" id="sec-listas">
+          <div class="cartao cartao-pad">
+            <div class="sec-topo">
+              <div><h2 id="listaTitulo"></h2><p id="listaDesc"></p></div>
+            </div>
+            <div class="segmentos" id="segLista">
+              <button data-lista="solicitantes" class="ativo">Solicitantes</button>
+              <button data-lista="responsaveis">Responsáveis</button>
+              <button data-lista="tipos">Tipos de ação</button>
+            </div>
+            <div class="add-linha">
+              <input type="text" id="novoItem" maxlength="60">
+              <button class="btn btn-primario" id="btnAddItem">Adicionar</button>
+            </div>
+            <div class="lista-itens" id="listaItens"></div>
+            <p class="dica" style="margin:12px 0 0">
+              <b>Renomear</b> atualiza todas as demandas que usam o item.
+              <b>Desativar</b> (⏸) tira o item dos formulários sem apagar nada — as demandas antigas
+              continuam mostrando o nome; dá para reativar depois.
+              A exclusão definitiva (🗑) só aparece depois de desativar — e, se o item ainda estiver
+              em uso, ela apaga junto as demandas vinculadas, com aviso do quanto será perdido.</p>
+          </div>
+        </section>
+        <% } %>
+
+        <!-- Usuários -->
+        <% if (pode['usuario.administrar']) { %>
+        <section class="config-sec<%= portal ? ' ativa' : '' %>" id="sec-usuarios">
+          <div class="cartao cartao-pad">
+            <div class="sec-topo"><div><h2>Contas de acesso</h2>
+              <p><%= portal ? 'Quem pode entrar no portal de ' + portal.nome + '.'
+                            : 'Administradores do sistema principal e usuários de cada empresa.' %></p></div></div>
+
+            <% if (usuario.perfil === 'admin') { %>
+            <div class="campo" style="max-width:360px">
+              <label for="uEscopo">Contas de</label>
+              <select id="uEscopo"></select>
+            </div>
+            <% } %>
+
+            <div class="add-linha">
+              <button class="btn btn-primario" id="btnAddUsuario">+ Nova conta de acesso</button>
+            </div>
+            <div class="lista-itens" id="listaUsuarios"></div>
+            <p class="dica" style="margin:12px 0 0">Desativar bloqueia o acesso sem apagar o histórico.
+              Trocar a senha encerra as sessões abertas daquele usuário.
+              O 🛡️ troca o perfil de acesso da conta.</p>
+          </div>
+        </section>
+        <% } %>
+
+        <!-- Perfis e permissões -->
+        <% if (pode['perfil.administrar']) { %>
+        <section class="config-sec" id="sec-perfis">
+          <div class="cartao cartao-pad">
+            <div class="sec-topo"><div><h2>Perfis e permissões</h2>
+              <p>Um perfil é um nome com um conjunto de permissões. As contas apontam
+                 para ele — mudou o perfil, mudou para todo mundo que o usa.</p></div></div>
+
+            <div id="listaPerfis"></div>
+            <p class="dica" id="dicaPerfis" style="margin:12px 0 0"></p>
+          </div>
+        </section>
+        <% } %>
+
+        <% if (usuario.perfil === 'admin') { %>
+        <!-- Empresas e seus sistemas -->
+        <section class="config-sec ativa" id="sec-empresas">
+          <div class="cartao cartao-pad" style="margin-bottom:16px">
+            <div class="sec-topo"><div><h2>Nova empresa</h2>
+              <p>Cadastre a empresa para gerar o portal exclusivo dela, com as OD dos
+                 sistemas que você atribuir.</p></div></div>
+            <div class="linha">
+              <div class="campo"><label for="eNome">Nome da empresa *</label>
+                <input type="text" id="eNome" maxlength="60" placeholder="Ex.: Barbearia do Zé"></div>
+              <div class="campo"><label>Sistemas do cliente</label>
+                <div id="eSistemas" class="campos-repetidos"></div>
+                <button type="button" class="btn btn-sm" id="btnAddLinhaSistema">+ Adicionar sistema</button>
+                <div class="dica">Cadastre quantos precisar. Dá para acrescentar outros depois,
+                  no cartão da empresa.</div></div>
+            </div>
+            <div class="linha">
+              <div class="campo"><label for="eDocumento">CNPJ / documento</label>
+                <input type="text" id="eDocumento" maxlength="30"></div>
+              <div class="campo"><label for="eContato">Contato</label>
+                <input type="text" id="eContato" maxlength="60" placeholder="telefone ou e-mail"></div>
+            </div>
+            <h2 class="sec" style="margin-top:6px">Primeiro acesso (gestor da empresa)</h2>
+            <div class="linha">
+              <div class="campo"><label for="eResponsavel">Nome do gestor</label>
+                <input type="text" id="eResponsavel" maxlength="60"></div>
+              <div class="campo"><label for="eEmail">E-mail de acesso</label>
+                <input type="text" id="eEmail" maxlength="80">
+                <div class="dica" id="avisoEmail"></div></div>
+              <div class="campo"><label for="eSenha">Senha inicial</label>
+                <input type="password" id="eSenha" maxlength="60" placeholder="mín. 8 caracteres"></div>
+            </div>
+            <div class="barra-acoes">
+              <button class="btn btn-primario" id="btnAddEmpresa">Cadastrar empresa</button>
+            </div>
+          </div>
+
+          <div class="cartao cartao-pad">
+            <div class="sec-topo"><div><h2>Empresas cadastradas</h2>
+              <p>Cada uma tem endereço próprio; copie o link e envie ao cliente.</p></div></div>
+            <div id="listaEmpresas"></div>
+          </div>
+        </section>
+        <% } %>
+
+        <!-- Identificação -->
+        <% if (usuario.perfil === 'admin') { %>
+        <section class="config-sec" id="sec-identidade">
+          <div class="cartao cartao-pad">
+            <div class="sec-topo"><div><h2>Identificação</h2>
+              <p>Como o sistema se apresenta e como as ordens são numeradas.</p></div></div>
+            <div class="linha">
+              <div class="campo"><label for="cOrg">Nome do órgão / empresa</label>
+                <input type="text" id="cOrg" maxlength="60"></div>
+              <div class="campo"><label for="cPrefixo">Prefixo do número</label>
+                <input type="text" id="cPrefixo" maxlength="6" placeholder="OD">
+                <div class="dica">Somente letras e números.</div></div>
+            </div>
+            <div class="destaque">
+              <div><span>Próxima OD a ser gerada</span><b id="previaNumero"></b></div>
+              <div><span>Total registrado</span><b id="previaTotal"></b></div>
+            </div>
+          </div>
+        </section>
+
+        <% } %>
+
+        <% if (!portal) { %>
+        <!-- Dados -->
+        <section class="config-sec" id="sec-dados">
+          <div class="cartao cartao-pad" style="margin-bottom:16px">
+            <div class="sec-topo"><div><h2>Dados e backup</h2>
+              <p>Tudo fica salvo apenas neste navegador. Exporte com regularidade.</p></div></div>
+            <div class="acao-bloco">
+              <div><b>Exportar backup</b><p>Baixa um arquivo .json com demandas, listas e configurações.</p></div>
+              <button class="btn" id="btnExportar">Exportar</button>
+            </div>
+            <div class="acao-bloco">
+              <div><b>Importar backup</b><p>Substitui todos os dados atuais pelos do arquivo escolhido.</p></div>
+              <button class="btn" id="btnImportar">Importar</button>
+            </div>
+            <% if (usuario.perfil === 'admin') { %>
+            <div class="acao-bloco">
+              <div><b>Carregar exemplos</b><p>Cria seis demandas fictícias para testar o sistema.</p></div>
+              <button class="btn" id="btnExemplo">Carregar</button>
+            </div>
+            <% } %>
+            <input type="file" id="arquivoImport" accept="application/json" hidden>
+          </div>
+          <div class="cartao cartao-pad zona-perigo">
+            <div class="sec-topo"><div><h2>Zona de risco</h2>
+              <p>Ações irreversíveis. Faça um backup antes de continuar.</p></div></div>
+            <div class="acao-bloco">
+              <div><b>Apagar todas as demandas</b><p>Remove os registros e zera a numeração. As listas são mantidas.</p></div>
+              <button class="btn btn-perigo" id="btnApagar">Apagar tudo</button>
+            </div>
+          </div>
+        </section>
+        <% } %>
+      </div>
+    </div>
+  </section>

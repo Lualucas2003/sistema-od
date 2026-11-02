@@ -1,0 +1,710 @@
+{
+  "org": "HeuCode",
+  "prefixo": "OD",
+  "sistemas": [
+    "Não — demanda nova",
+    "Sistema Financeiro",
+    "Portal Web",
+    "Aplicativo Mobile",
+    "Intranet",
+    "API / Integração",
+    "Sistema de Agendamento"
+  ],
+  "solicitantes": [
+    "Cliente",
+    "Equipe interna",
+    "Diretoria",
+    "Suporte",
+    "Comercial",
+    "Financeiro"
+  ],
+  "responsaveis": [
+    "Não atribuído",
+    "Ana Paula Torres",
+    "Luan Oliveira",
+    "Marcos Reis",
+    "Beatriz Nunes",
+    "Rafael Campos"
+  ],
+  "demandas": [
+    {
+      "id": "db_1",
+      "numero": "OD-2026-0001",
+      "titulo": "Erro 500 ao emitir boleto no fechamento",
+      "descricao": "Na emissão dos boletos do dia 30 o sistema retorna erro 500 e não grava o registro. Ocorre apenas no lote acima de 200 títulos.",
+      "solicitante": "Cliente",
+      "sistema": "Sistema Financeiro",
+      "responsavel": "Ana Paula Torres",
+      "prioridade": "urgente",
+      "status": "andamento",
+      "criadaEm": "2026-08-31T16:50:37.876Z",
+      "concluidaEm": null,
+      "historico": [
+        {
+          "em": "2026-08-31T16:50:37.876Z",
+          "texto": "Demanda registrada por Cliente."
+        },
+        {
+          "em": "2026-09-01T16:50:37.876Z",
+          "texto": "Log analisado: estouro de timeout no serviço de cobrança acima de 200 títulos."
+        }
+      ]
+    },
+    {
+      "id": "db_2",
+      "numero": "OD-2026-0002",
+      "titulo": "Lentidão no login do portal",
+      "descricao": "Usuários relatam mais de 20 segundos para autenticar entre 8h e 10h. Fora do pico o login leva 2 segundos.",
+      "solicitante": "Suporte",
+      "sistema": "Portal Web",
+      "responsavel": "Luan Oliveira",
+      "prioridade": "alta",
+      "status": "aberta",
+      "criadaEm": "2026-09-04T16:50:37.876Z",
+      "concluidaEm": null,
+      "historico": [
+        {
+          "em": "2026-09-04T16:50:37.876Z",
+          "texto": "Demanda registrada por Suporte."
+        },
+        {
+          "em": "2026-09-05T16:50:37.876Z",
+          "texto": "Identificado gargalo na consulta de permissões; índice em avaliação."
+        }
+      ]
+    },
+    {
+      "id": "db_3",
+      "numero": "OD-2026-0003",
+      "titulo": "Push de notificações não chega no Android",
+      "descricao": "Notificações funcionam no iOS, mas não são entregues em aparelhos com Android 13 ou superior.",
+      "solicitante": "Suporte",
+      "sistema": "Aplicativo Mobile",
+      "responsavel": "Marcos Reis",
+      "prioridade": "alta",
+      "status": "aguardando",
+      "criadaEm": "2026-08-26T16:50:37.876Z",
+      "concluidaEm": null,
+      "historico": [
+        {
+          "em": "2026-08-26T16:50:37.876Z",
+          "texto": "Demanda registrada por Suporte."
+        },
+        {
+          "em": "2026-08-27T16:50:37.876Z",
+          "texto": "Aguardando retorno do fornecedor sobre a mudança de política do Android 13."
+        }
+      ]
+    },
+    {
+      "id": "db_4",
+      "numero": "OD-2026-0004",
+      "titulo": "Nova tela de relatórios gerenciais",
+      "descricao": "Criar painel com indicadores mensais consolidados por unidade, com exportação em PDF.",
+      "solicitante": "Diretoria",
+      "sistema": "Não — demanda nova",
+      "responsavel": "Beatriz Nunes",
+      "prioridade": "media",
+      "status": "andamento",
+      "criadaEm": "2026-08-18T16:50:37.876Z",
+      "concluidaEm": null,
+      "historico": [
+        {
+          "em": "2026-08-18T16:50:37.876Z",
+          "texto": "Demanda registrada por Diretoria."
+        }
+      ]
+    },
+    {
+      "id": "db_5",
+      "numero": "OD-2026-0005",
+      "titulo": "Integração com o novo gateway de pagamento",
+      "descricao": "Implementar consumo da API de cobrança do parceiro já homologado, incluindo retentativa automática.",
+      "solicitante": "Equipe interna",
+      "sistema": "API / Integração",
+      "responsavel": "Luan Oliveira",
+      "prioridade": "alta",
+      "status": "andamento",
+      "criadaEm": "2026-08-22T16:50:37.876Z",
+      "concluidaEm": null,
+      "historico": [
+        {
+          "em": "2026-08-22T16:50:37.876Z",
+          "texto": "Demanda registrada por Equipe interna."
+        },
+        {
+          "em": "2026-08-23T16:50:37.876Z",
+          "texto": "Ambiente de homologação liberado pelo parceiro."
+        }
+      ]
+    },
+    {
+      "id": "db_6",
+      "numero": "OD-2026-0006",
+      "titulo": "Exportação de contatos com acentuação quebrada",
+      "descricao": "O CSV exportado pela intranet vem com caracteres trocados ao abrir no Excel.",
+      "solicitante": "Equipe interna",
+      "sistema": "Intranet",
+      "responsavel": "Rafael Campos",
+      "prioridade": "baixa",
+      "status": "concluida",
+      "criadaEm": "2026-07-31T16:50:37.876Z",
+      "concluidaEm": "2026-08-06T16:50:37.876Z",
+      "historico": [
+        {
+          "em": "2026-07-31T16:50:37.876Z",
+          "texto": "Demanda registrada por Equipe interna."
+        },
+        {
+          "em": "2026-08-06T16:50:37.876Z",
+          "texto": "Demanda concluída e validada com o solicitante."
+        }
+      ]
+    },
+    {
+      "id": "db_7",
+      "numero": "OD-2026-0007",
+      "titulo": "Agenda permite dois agendamentos no mesmo horário",
+      "descricao": "Em concorrência, dois clientes conseguem reservar o mesmo profissional no mesmo horário.",
+      "solicitante": "Cliente",
+      "sistema": "Sistema de Agendamento",
+      "responsavel": "Ana Paula Torres",
+      "prioridade": "urgente",
+      "status": "concluida",
+      "criadaEm": "2026-07-19T16:50:37.876Z",
+      "concluidaEm": "2026-07-28T16:50:37.876Z",
+      "historico": [
+        {
+          "em": "2026-07-19T16:50:37.876Z",
+          "texto": "Demanda registrada por Cliente."
+        },
+        {
+          "em": "2026-07-28T16:50:37.876Z",
+          "texto": "Demanda concluída e validada com o solicitante."
+        }
+      ]
+    },
+    {
+      "id": "db_8",
+      "numero": "OD-2026-0008",
+      "titulo": "Recuperação de senha não envia e-mail",
+      "descricao": "O e-mail de redefinição não chega para domínios corporativos; provável bloqueio de SPF.",
+      "solicitante": "Suporte",
+      "sistema": "Portal Web",
+      "responsavel": "Marcos Reis",
+      "prioridade": "alta",
+      "status": "concluida",
+      "criadaEm": "2026-07-10T16:50:37.876Z",
+      "concluidaEm": "2026-07-14T16:50:37.876Z",
+      "historico": [
+        {
+          "em": "2026-07-10T16:50:37.876Z",
+          "texto": "Demanda registrada por Suporte."
+        },
+        {
+          "em": "2026-07-14T16:50:37.876Z",
+          "texto": "Demanda concluída e validada com o solicitante."
+        }
+      ]
+    },
+    {
+      "id": "db_9",
+      "numero": "OD-2026-0009",
+      "titulo": "Incluir centro de custo no relatório de despesas",
+      "descricao": "O relatório mensal consolidado precisa quebrar os valores por centro de custo.",
+      "solicitante": "Financeiro",
+      "sistema": "Sistema Financeiro",
+      "responsavel": "Beatriz Nunes",
+      "prioridade": "media",
+      "status": "concluida",
+      "criadaEm": "2026-06-28T16:50:37.876Z",
+      "concluidaEm": "2026-07-10T16:50:37.876Z",
+      "historico": [
+        {
+          "em": "2026-06-28T16:50:37.876Z",
+          "texto": "Demanda registrada por Financeiro."
+        },
+        {
+          "em": "2026-07-10T16:50:37.876Z",
+          "texto": "Demanda concluída e validada com o solicitante."
+        }
+      ]
+    },
+    {
+      "id": "db_10",
+      "numero": "OD-2026-0010",
+      "titulo": "Erro de arredondamento no cálculo de comissão",
+      "descricao": "Comissões de 3,5% apresentam diferença de centavos em relação à planilha do comercial.",
+      "solicitante": "Comercial",
+      "sistema": "Sistema Financeiro",
+      "responsavel": "Rafael Campos",
+      "prioridade": "alta",
+      "status": "andamento",
+      "criadaEm": "2026-08-28T16:50:37.876Z",
+      "concluidaEm": null,
+      "historico": [
+        {
+          "em": "2026-08-28T16:50:37.876Z",
+          "texto": "Demanda registrada por Comercial."
+        }
+      ]
+    },
+    {
+      "id": "db_11",
+      "numero": "OD-2026-0011",
+      "titulo": "Cadastro de cliente sem validação de CPF",
+      "descricao": "É possível salvar cliente com CPF inválido; incluir validação no formulário e na API.",
+      "solicitante": "Equipe interna",
+      "sistema": "Portal Web",
+      "responsavel": "Luan Oliveira",
+      "prioridade": "media",
+      "status": "aberta",
+      "criadaEm": "2026-09-02T16:50:37.876Z",
+      "concluidaEm": null,
+      "historico": [
+        {
+          "em": "2026-09-02T16:50:37.876Z",
+          "texto": "Demanda registrada por Equipe interna."
+        }
+      ]
+    },
+    {
+      "id": "db_12",
+      "numero": "OD-2026-0012",
+      "titulo": "Aplicativo trava ao abrir a câmera",
+      "descricao": "Ao anexar foto no atendimento, o app fecha sozinho em aparelhos com pouca memória.",
+      "solicitante": "Suporte",
+      "sistema": "Aplicativo Mobile",
+      "responsavel": "Marcos Reis",
+      "prioridade": "alta",
+      "status": "aguardando",
+      "criadaEm": "2026-08-14T16:50:37.876Z",
+      "concluidaEm": null,
+      "historico": [
+        {
+          "em": "2026-08-14T16:50:37.876Z",
+          "texto": "Demanda registrada por Suporte."
+        }
+      ]
+    },
+    {
+      "id": "db_13",
+      "numero": "OD-2026-0013",
+      "titulo": "Migrar autenticação para SSO",
+      "descricao": "Unificar o acesso da intranet com a conta corporativa via SSO.",
+      "solicitante": "Diretoria",
+      "sistema": "Intranet",
+      "responsavel": "Ana Paula Torres",
+      "prioridade": "media",
+      "status": "aberta",
+      "criadaEm": "2026-09-06T16:50:37.876Z",
+      "concluidaEm": null,
+      "historico": [
+        {
+          "em": "2026-09-06T16:50:37.876Z",
+          "texto": "Demanda registrada por Diretoria."
+        }
+      ]
+    },
+    {
+      "id": "db_14",
+      "numero": "OD-2026-0014",
+      "titulo": "Webhook de confirmação duplicando eventos",
+      "descricao": "O parceiro envia o mesmo evento até três vezes; falta idempotência no consumo.",
+      "solicitante": "Equipe interna",
+      "sistema": "API / Integração",
+      "responsavel": "Luan Oliveira",
+      "prioridade": "urgente",
+      "status": "andamento",
+      "criadaEm": "2026-08-24T16:50:37.876Z",
+      "concluidaEm": null,
+      "historico": [
+        {
+          "em": "2026-08-24T16:50:37.876Z",
+          "texto": "Demanda registrada por Equipe interna."
+        },
+        {
+          "em": "2026-08-25T16:50:37.876Z",
+          "texto": "Chave de idempotência definida; implementação em andamento."
+        }
+      ]
+    },
+    {
+      "id": "db_15",
+      "numero": "OD-2026-0015",
+      "titulo": "Bloquear agendamento em feriado",
+      "descricao": "A agenda precisa considerar o calendário de feriados por unidade.",
+      "solicitante": "Cliente",
+      "sistema": "Sistema de Agendamento",
+      "responsavel": "Beatriz Nunes",
+      "prioridade": "media",
+      "status": "aberta",
+      "criadaEm": "2026-08-29T16:50:37.876Z",
+      "concluidaEm": null,
+      "historico": [
+        {
+          "em": "2026-08-29T16:50:37.876Z",
+          "texto": "Demanda registrada por Cliente."
+        }
+      ]
+    },
+    {
+      "id": "db_16",
+      "numero": "OD-2026-0016",
+      "titulo": "Relatório de faturamento não confere com o extrato",
+      "descricao": "Diferença de R$ 1.240,00 no fechamento de agosto entre relatório e extrato bancário.",
+      "solicitante": "Financeiro",
+      "sistema": "Sistema Financeiro",
+      "responsavel": "Rafael Campos",
+      "prioridade": "urgente",
+      "status": "aguardando",
+      "criadaEm": "2026-08-20T16:50:37.876Z",
+      "concluidaEm": null,
+      "historico": [
+        {
+          "em": "2026-08-20T16:50:37.876Z",
+          "texto": "Demanda registrada por Financeiro."
+        },
+        {
+          "em": "2026-08-21T16:50:37.876Z",
+          "texto": "Solicitado extrato detalhado ao banco para conciliação."
+        }
+      ]
+    },
+    {
+      "id": "db_17",
+      "numero": "OD-2026-0017",
+      "titulo": "Melhorar contraste da interface do portal",
+      "descricao": "Textos cinza sobre fundo claro reprovam em acessibilidade; ajustar paleta.",
+      "solicitante": "Suporte",
+      "sistema": "Portal Web",
+      "responsavel": "Beatriz Nunes",
+      "prioridade": "baixa",
+      "status": "concluida",
+      "criadaEm": "2026-06-13T16:50:37.876Z",
+      "concluidaEm": "2026-06-28T16:50:37.876Z",
+      "historico": [
+        {
+          "em": "2026-06-13T16:50:37.876Z",
+          "texto": "Demanda registrada por Suporte."
+        },
+        {
+          "em": "2026-06-28T16:50:37.876Z",
+          "texto": "Demanda concluída e validada com o solicitante."
+        }
+      ]
+    },
+    {
+      "id": "db_18",
+      "numero": "OD-2026-0018",
+      "titulo": "Histórico de atendimento não carrega no app",
+      "descricao": "A aba de histórico fica em branco para clientes com mais de 200 atendimentos.",
+      "solicitante": "Cliente",
+      "sistema": "Aplicativo Mobile",
+      "responsavel": "Marcos Reis",
+      "prioridade": "alta",
+      "status": "concluida",
+      "criadaEm": "2026-06-06T16:50:37.876Z",
+      "concluidaEm": "2026-06-13T16:50:37.876Z",
+      "historico": [
+        {
+          "em": "2026-06-06T16:50:37.876Z",
+          "texto": "Demanda registrada por Cliente."
+        },
+        {
+          "em": "2026-06-13T16:50:37.876Z",
+          "texto": "Demanda concluída e validada com o solicitante."
+        }
+      ]
+    },
+    {
+      "id": "db_19",
+      "numero": "OD-2026-0019",
+      "titulo": "Criar rotina de backup automático",
+      "descricao": "Agendar backup diário do banco com retenção de 30 dias e alerta em caso de falha.",
+      "solicitante": "Equipe interna",
+      "sistema": "Não — demanda nova",
+      "responsavel": "Luan Oliveira",
+      "prioridade": "alta",
+      "status": "concluida",
+      "criadaEm": "2026-05-28T16:50:37.876Z",
+      "concluidaEm": "2026-06-08T16:50:37.876Z",
+      "historico": [
+        {
+          "em": "2026-05-28T16:50:37.876Z",
+          "texto": "Demanda registrada por Equipe interna."
+        },
+        {
+          "em": "2026-06-08T16:50:37.876Z",
+          "texto": "Demanda concluída e validada com o solicitante."
+        }
+      ]
+    },
+    {
+      "id": "db_20",
+      "numero": "OD-2026-0020",
+      "titulo": "Filtro por período no painel da intranet",
+      "descricao": "Adicionar seleção de intervalo de datas nos indicadores da intranet.",
+      "solicitante": "Diretoria",
+      "sistema": "Intranet",
+      "responsavel": "Beatriz Nunes",
+      "prioridade": "baixa",
+      "status": "aberta",
+      "criadaEm": "2026-08-10T16:50:37.876Z",
+      "concluidaEm": null,
+      "historico": [
+        {
+          "em": "2026-08-10T16:50:37.876Z",
+          "texto": "Demanda registrada por Diretoria."
+        }
+      ]
+    },
+    {
+      "id": "db_21",
+      "numero": "OD-2026-0021",
+      "titulo": "Timeout na consulta de disponibilidade",
+      "descricao": "A chamada de disponibilidade estoura 30s quando a unidade tem muitos profissionais.",
+      "solicitante": "Equipe interna",
+      "sistema": "API / Integração",
+      "responsavel": "Ana Paula Torres",
+      "prioridade": "alta",
+      "status": "andamento",
+      "criadaEm": "2026-08-07T16:50:37.876Z",
+      "concluidaEm": null,
+      "historico": [
+        {
+          "em": "2026-08-07T16:50:37.876Z",
+          "texto": "Demanda registrada por Equipe interna."
+        }
+      ]
+    },
+    {
+      "id": "db_22",
+      "numero": "OD-2026-0022",
+      "titulo": "Permitir reagendamento pelo cliente",
+      "descricao": "O cliente deve conseguir remarcar o horário até 4 horas antes do atendimento.",
+      "solicitante": "Cliente",
+      "sistema": "Sistema de Agendamento",
+      "responsavel": "Marcos Reis",
+      "prioridade": "media",
+      "status": "aberta",
+      "criadaEm": "2026-08-16T16:50:37.876Z",
+      "concluidaEm": null,
+      "historico": [
+        {
+          "em": "2026-08-16T16:50:37.876Z",
+          "texto": "Demanda registrada por Cliente."
+        }
+      ]
+    },
+    {
+      "id": "db_23",
+      "numero": "OD-2026-0023",
+      "titulo": "Nota fiscal emitida com endereço antigo",
+      "descricao": "Após atualização cadastral, a NF continua saindo com o endereço anterior.",
+      "solicitante": "Financeiro",
+      "sistema": "Sistema Financeiro",
+      "responsavel": "Rafael Campos",
+      "prioridade": "alta",
+      "status": "concluida",
+      "criadaEm": "2026-05-12T16:50:37.876Z",
+      "concluidaEm": "2026-05-21T16:50:37.876Z",
+      "historico": [
+        {
+          "em": "2026-05-12T16:50:37.876Z",
+          "texto": "Demanda registrada por Financeiro."
+        },
+        {
+          "em": "2026-05-21T16:50:37.876Z",
+          "texto": "Demanda concluída e validada com o solicitante."
+        }
+      ]
+    },
+    {
+      "id": "db_24",
+      "numero": "OD-2026-0024",
+      "titulo": "Campo de busca ignora acentos",
+      "descricao": "Buscar por \"joao\" não encontra \"João\"; normalizar acentuação na consulta.",
+      "solicitante": "Suporte",
+      "sistema": "Portal Web",
+      "responsavel": "Luan Oliveira",
+      "prioridade": "baixa",
+      "status": "concluida",
+      "criadaEm": "2026-05-01T16:50:37.876Z",
+      "concluidaEm": "2026-05-06T16:50:37.876Z",
+      "historico": [
+        {
+          "em": "2026-05-01T16:50:37.876Z",
+          "texto": "Demanda registrada por Suporte."
+        },
+        {
+          "em": "2026-05-06T16:50:37.876Z",
+          "texto": "Demanda concluída e validada com o solicitante."
+        }
+      ]
+    },
+    {
+      "id": "db_25",
+      "numero": "OD-2026-0025",
+      "titulo": "Padronizar mensagens de erro da API",
+      "descricao": "Respostas de erro seguem formatos diferentes conforme o endpoint.",
+      "solicitante": "Equipe interna",
+      "sistema": "API / Integração",
+      "responsavel": "Ana Paula Torres",
+      "prioridade": "media",
+      "status": "cancelada",
+      "criadaEm": "2026-07-05T16:50:37.876Z",
+      "concluidaEm": null,
+      "historico": [
+        {
+          "em": "2026-07-05T16:50:37.876Z",
+          "texto": "Demanda registrada por Equipe interna."
+        }
+      ]
+    },
+    {
+      "id": "db_26",
+      "numero": "OD-2026-0026",
+      "titulo": "Trocar provedor de SMS",
+      "descricao": "Avaliar a substituição do provedor atual por custo e taxa de entrega.",
+      "solicitante": "Diretoria",
+      "sistema": "Não — demanda nova",
+      "responsavel": "Não atribuído",
+      "prioridade": "baixa",
+      "status": "cancelada",
+      "criadaEm": "2026-07-24T16:50:37.876Z",
+      "concluidaEm": null,
+      "historico": [
+        {
+          "em": "2026-07-24T16:50:37.876Z",
+          "texto": "Demanda registrada por Diretoria."
+        }
+      ]
+    },
+    {
+      "id": "db_27",
+      "numero": "OD-2026-0027",
+      "titulo": "Duplicidade de cliente no cadastro",
+      "descricao": "Mesmo cliente aparece duas vezes quando cadastrado pelo app e pelo portal.",
+      "solicitante": "Suporte",
+      "sistema": "Aplicativo Mobile",
+      "responsavel": "Beatriz Nunes",
+      "prioridade": "media",
+      "status": "aguardando",
+      "criadaEm": "2026-08-02T16:50:37.876Z",
+      "concluidaEm": null,
+      "historico": [
+        {
+          "em": "2026-08-02T16:50:37.876Z",
+          "texto": "Demanda registrada por Suporte."
+        }
+      ]
+    },
+    {
+      "id": "db_28",
+      "numero": "OD-2026-0028",
+      "titulo": "Painel de metas do comercial",
+      "descricao": "Criar acompanhamento de metas por vendedor com atualização diária.",
+      "solicitante": "Comercial",
+      "sistema": "Não — demanda nova",
+      "responsavel": "Não atribuído",
+      "prioridade": "media",
+      "status": "aberta",
+      "criadaEm": "2026-09-07T16:50:37.876Z",
+      "concluidaEm": null,
+      "historico": [
+        {
+          "em": "2026-09-07T16:50:37.876Z",
+          "texto": "Demanda registrada por Comercial."
+        }
+      ]
+    },
+    {
+      "id": "db_29",
+      "numero": "OD-2026-0029",
+      "titulo": "Exportar agenda para o Google Calendar",
+      "descricao": "Sincronizar os agendamentos confirmados com a agenda do profissional.",
+      "solicitante": "Cliente",
+      "sistema": "Sistema de Agendamento",
+      "responsavel": "Luan Oliveira",
+      "prioridade": "baixa",
+      "status": "aberta",
+      "criadaEm": "2026-07-27T16:50:37.876Z",
+      "concluidaEm": null,
+      "historico": [
+        {
+          "em": "2026-07-27T16:50:37.876Z",
+          "texto": "Demanda registrada por Cliente."
+        }
+      ]
+    },
+    {
+      "id": "db_30",
+      "numero": "OD-2026-0030",
+      "titulo": "Log de auditoria de alterações cadastrais",
+      "descricao": "Registrar quem alterou dados sensíveis de cliente, com data e valor anterior.",
+      "solicitante": "Diretoria",
+      "sistema": "Intranet",
+      "responsavel": "Ana Paula Torres",
+      "prioridade": "alta",
+      "status": "andamento",
+      "criadaEm": "2026-07-14T16:50:37.876Z",
+      "concluidaEm": null,
+      "historico": [
+        {
+          "em": "2026-07-14T16:50:37.876Z",
+          "texto": "Demanda registrada por Diretoria."
+        }
+      ]
+    },
+    {
+      "id": "db_31",
+      "numero": "OD-2026-0031",
+      "titulo": "Corrigir fuso horário nos relatórios",
+      "descricao": "Atendimentos após as 21h aparecem no dia seguinte por conversão errada de fuso.",
+      "solicitante": "Financeiro",
+      "sistema": "Sistema Financeiro",
+      "responsavel": "Marcos Reis",
+      "prioridade": "alta",
+      "status": "concluida",
+      "criadaEm": "2026-04-12T16:50:37.876Z",
+      "concluidaEm": "2026-04-20T16:50:37.876Z",
+      "historico": [
+        {
+          "em": "2026-04-12T16:50:37.876Z",
+          "texto": "Demanda registrada por Financeiro."
+        },
+        {
+          "em": "2026-04-20T16:50:37.876Z",
+          "texto": "Demanda concluída e validada com o solicitante."
+        }
+      ]
+    },
+    {
+      "id": "db_32",
+      "numero": "OD-2026-0032",
+      "titulo": "Reduzir tamanho do app na loja",
+      "descricao": "O pacote passou de 90 MB; remover recursos não utilizados.",
+      "solicitante": "Equipe interna",
+      "sistema": "Aplicativo Mobile",
+      "responsavel": "Rafael Campos",
+      "prioridade": "baixa",
+      "status": "concluida",
+      "criadaEm": "2026-03-30T16:50:37.876Z",
+      "concluidaEm": "2026-04-20T16:50:37.876Z",
+      "historico": [
+        {
+          "em": "2026-03-30T16:50:37.876Z",
+          "texto": "Demanda registrada por Equipe interna."
+        },
+        {
+          "em": "2026-04-20T16:50:37.876Z",
+          "texto": "Demanda concluída e validada com o solicitante."
+        }
+      ]
+    }
+  ],
+  "sequencias": {
+    "2026": 32
+  }
+}

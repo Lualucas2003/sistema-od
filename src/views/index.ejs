@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-tema="escuro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title><%= titulo %></title>
+<link rel="stylesheet" href="/css/od.css?v=<%= versao %>">
+</head>
+<body>
+
+<%- include('partials/cabecalho') %>
+
+<main>
+  <%- include('partials/painel') %>
+  <%- include('partials/demandas') %>
+  <%- include('partials/formulario') %>
+  <%- include('partials/projetos') %>
+  <%- include('partials/analise') %>
+  <%- include('partials/config') %>
+</main>
+
+<%- include('partials/modal') %>
+
+<!-- Visor de imagem em tela cheia -->
+<div class="visor" id="visorImagem">
+  <div class="visor-topo">
+    <span id="visorNome"></span>
+    <a class="btn btn-sm" id="visorBaixar" href="#" download>Baixar</a>
+    <button class="fechar" id="visorFechar" aria-label="Fechar">&times;</button>
+  </div>
+  <img id="visorFoto" alt="">
+</div>
+
+<div id="toasts"></div>
+
+<!-- Enums e listas vindos do banco, para o cliente montar selects e etiquetas -->
+<script id="dados-iniciais" type="application/json">
+  <%- JSON.stringify({ config: config, listas: listas, situacoes: situacoes,
+                       prioridades: prioridades, base: base, portal: portal,
+                       usuario: usuario, pode: pode }) %>
+</script>
+<script type="module" src="/js/<%= versao %>/app.js"></script>
+</body>
+</html>

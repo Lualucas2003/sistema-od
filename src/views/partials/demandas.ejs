@@ -1,0 +1,41 @@
+<section class="pagina" id="pg-demandas">
+    <div class="cabecalho-pagina">
+      <div><h1>Demandas</h1><p>Consulte, filtre e acompanhe todas as ordens registradas.</p></div>
+      <div class="barra-acoes">
+        <button class="btn" id="btnCsv">Exportar CSV</button>
+        <button class="btn btn-primario" data-ir="nova">+ Nova OD</button>
+      </div>
+    </div>
+
+    <div class="filtros">
+      <div class="campo"><label for="fBusca">Buscar</label>
+        <input type="search" id="fBusca" placeholder="Número, título, solicitante..."></div>
+      <div class="campo"><label for="fStatus">Situação</label><select id="fStatus"></select></div>
+      <div class="campo"><label for="fPrioridade">Prioridade</label><select id="fPrioridade"></select></div>
+      <div class="campo"><label for="fSistema">Sistema</label><select id="fSistema"></select></div>
+      <div class="campo"><label for="fResponsavel">Responsável</label><select id="fResponsavel"></select></div>
+      <div class="campo"><label for="fTipo">Tipo de ação</label><select id="fTipo"></select></div>
+      <button class="btn" id="btnLimpar">Limpar</button>
+    </div>
+
+    <div class="cartao">
+      <div class="rolagem">
+        <table id="tabela">
+          <thead><tr>
+            <th data-ord="numero">OD <span class="seta"></span></th>
+            <th data-ord="titulo">Título <span class="seta"></span></th>
+            <th data-ord="sistema">Sistema <span class="seta"></span></th>
+            <th data-ord="responsavel">Responsável <span class="seta"></span></th>
+            <th data-ord="prioridade">Prioridade <span class="seta"></span></th>
+            <th data-ord="status">Situação <span class="seta"></span></th>
+            <th data-ord="criadaEm">Abertura <span class="seta"></span></th>
+          </tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="rodape-tabela">
+        <span id="contagem"></span>
+        <div class="paginacao" id="paginacao"></div>
+      </div>
+    </div>
+  </section>

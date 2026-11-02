@@ -1,0 +1,1799 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-tema="escuro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OD — Ordem de Demandas</title>
+<style>
+  /* ===== Paleta HeuCode ===== */
+  :root{
+    --vermelho:#e6273c; --rosa:#ff2d7e; --roxo:#8b30e8; --azul:#2f6bff;
+    --ciano:#00cfe0; --verde:#3fd94f; --amarelo:#ffd23f; --laranja:#ff6a2b;
+    --grad:linear-gradient(135deg,#ff2116 0%,#e6273c 18%,#ff2d7e 38%,#8b30e8 60%,#2f6bff 78%,#00cfe0 92%,#3fd94f 100%);
+
+    --bg:#000000; --surface:#0d0b0d; --surface-2:#171319; --border:#2b2028;
+    --text:#f4f2f4; --muted:#9a8f97;
+    --primary:#e6273c; --primary-soft:rgba(230,39,60,.16);
+    --roxo-soft:rgba(139,48,232,.16);
+    --ok:#3fd94f;   --ok-soft:rgba(63,217,79,.14);
+    --warn:#ffb03f; --warn-soft:rgba(255,176,63,.14);
+    --danger:#ff2d7e; --danger-soft:rgba(255,45,126,.16);
+    --info:#00cfe0; --info-soft:rgba(0,207,224,.14);
+    --neutral-soft:rgba(255,255,255,.07);
+    --shadow:0 1px 2px rgba(0,0,0,.6),0 12px 34px rgba(0,0,0,.5);
+    --radius:12px;
+  }
+  html[data-tema="claro"]{
+    --bg:#f7f5f6; --surface:#ffffff; --surface-2:#faf8f9; --border:#e6e0e3;
+    --text:#171214; --muted:#6f6469;
+    --primary:#cc1226; --primary-soft:rgba(204,18,38,.11);
+    --roxo-soft:rgba(139,48,232,.12);
+    --ok:#1aa63a;   --ok-soft:rgba(26,166,58,.12);
+    --warn:#b06a05; --warn-soft:rgba(255,176,63,.20);
+    --danger:#d4106a; --danger-soft:rgba(212,16,106,.11);
+    --info:#0090a8; --info-soft:rgba(0,207,224,.16);
+    --neutral-soft:#eeeaec;
+    --shadow:0 1px 2px rgba(20,16,18,.06),0 8px 24px rgba(20,16,18,.08);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);min-height:100vh;
+    font:14px/1.5 "Segoe UI",Roboto,-apple-system,Helvetica,Arial,sans-serif;
+    background-image:
+      radial-gradient(780px 440px at 6% -8%, rgba(230,39,60,.20), transparent 64%),
+      radial-gradient(620px 380px at 96% -6%, rgba(255,45,126,.10), transparent 62%),
+      radial-gradient(900px 520px at 50% 110%, rgba(139,48,232,.08), transparent 60%);
+    background-attachment:fixed;}
+  html[data-tema="claro"] body{background-image:
+      radial-gradient(720px 400px at 6% -8%, rgba(230,39,60,.12), transparent 62%),
+      radial-gradient(620px 380px at 96% -6%, rgba(0,207,224,.08), transparent 62%);}
+  ::-webkit-scrollbar{width:11px;height:11px}
+  ::-webkit-scrollbar-track{background:var(--surface-2)}
+  ::-webkit-scrollbar-thumb{background:#2c2c3c;border-radius:99px;border:3px solid var(--surface-2)}
+  ::-webkit-scrollbar-thumb:hover{background:var(--primary)}
+  .texto-grad{background:var(--grad);-webkit-background-clip:text;background-clip:text;
+    -webkit-text-fill-color:transparent;color:transparent}
+  h1,h2,h3{margin:0;font-weight:650;letter-spacing:-.01em}
+  button,input,select,textarea{font:inherit;color:inherit}
+
+  header.topo{position:sticky;top:0;z-index:40;background:rgba(12,12,18,.88);backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--border);box-shadow:0 1px 0 rgba(255,255,255,.03)}
+  html[data-tema="claro"] header.topo{background:rgba(255,255,255,.9)}
+  header.topo::after{content:"";display:block;height:2px;background:var(--grad);opacity:.9}
+  .topo-in{max-width:1320px;margin:0 auto;padding:10px 20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  .logo{display:flex;align-items:center;gap:11px}
+  .logo .mark{width:40px;height:40px;display:grid;place-items:center;color:#fff;font-weight:800;
+    font-size:13px;letter-spacing:.5px;background:var(--grad);
+    clip-path:polygon(50% 0%,93% 25%,93% 75%,50% 100%,7% 75%,7% 25%);
+    box-shadow:0 0 24px rgba(230,39,60,.5)}
+  .logo strong{display:block;font-size:15px;letter-spacing:-.01em}
+  .logo small{display:block;color:var(--muted);font-size:11px;letter-spacing:.06em;text-transform:uppercase}
+  nav.abas{display:flex;gap:4px;margin-left:auto;flex-wrap:wrap}
+  nav.abas button{background:none;border:0;padding:8px 14px;border-radius:9px;cursor:pointer;
+    color:var(--muted);font-weight:550}
+  nav.abas button:hover{background:var(--surface-2);color:var(--text)}
+  nav.abas button[aria-current="page"]{background:var(--primary-soft);color:#fff;
+    box-shadow:inset 0 0 0 1px rgba(230,39,60,.55)}
+  html[data-tema="claro"] nav.abas button[aria-current="page"]{color:var(--primary)}
+  .icone-btn{background:var(--surface-2);border:1px solid var(--border);border-radius:9px;
+    width:36px;height:36px;display:grid;place-items:center;cursor:pointer;font-size:15px}
+  .icone-btn:hover{border-color:var(--primary);color:var(--primary)}
+
+  main{max-width:1320px;margin:0 auto;padding:22px 20px 80px}
+  .pagina{display:none}
+  .pagina.ativa{display:block;animation:sobe .18s ease}
+  @keyframes sobe{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .cabecalho-pagina{display:flex;align-items:flex-end;gap:14px;margin-bottom:18px;flex-wrap:wrap}
+  .cabecalho-pagina p{margin:2px 0 0;color:var(--muted)}
+  .cabecalho-pagina .barra-acoes{margin-left:auto}
+
+  .cartao{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow)}
+  .cartao-pad{padding:18px}
+  .grade-kpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:14px;margin-bottom:18px}
+  .kpi{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+    padding:16px 18px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+  .kpi::after{content:"";position:absolute;inset:0 auto 0 0;width:4px;background:var(--cor,var(--primary))}
+  .kpi .rot{color:var(--muted);font-size:11.5px;text-transform:uppercase;letter-spacing:.05em}
+  .kpi .val{font-size:30px;font-weight:700;line-height:1.15;margin-top:4px}
+  .kpi .sub{color:var(--muted);font-size:12px}
+  .grade-2{display:grid;grid-template-columns:1.35fr 1fr;gap:16px;align-items:start}
+  @media(max-width:900px){.grade-2{grid-template-columns:1fr}}
+
+  .campo{display:flex;flex-direction:column;gap:5px;margin-bottom:14px}
+  .campo label{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+  input[type=text],input[type=date],input[type=search],select,textarea{
+    background:var(--surface-2);border:1px solid var(--border);border-radius:9px;padding:9px 11px;width:100%;
+    outline:none;transition:border-color .15s,box-shadow .15s}
+  input:focus,select:focus,textarea:focus{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-soft)}
+  textarea{resize:vertical;min-height:96px}
+  .linha{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:0 14px}
+  .invalido{border-color:var(--danger)!important}
+  .msg-erro{color:var(--danger);font-size:12px}
+  .dica{color:var(--muted);font-size:12px}
+
+  .btn{border:1px solid var(--border);background:var(--surface);border-radius:9px;padding:9px 16px;
+    cursor:pointer;font-weight:600;display:inline-flex;align-items:center;gap:7px}
+  .btn:hover{border-color:var(--primary);color:var(--primary)}
+  .btn-primario{background:var(--primary);border-color:var(--primary);color:#fff}
+  .btn-primario:hover{background:#c81f31;border-color:#c81f31;color:#fff}
+  html[data-tema="claro"] .btn-primario:hover{background:#a80d1f;border-color:#a80d1f}
+  .btn-perigo{color:var(--danger);border-color:var(--danger)}
+  .btn-perigo:hover{background:var(--danger);color:#fff}
+  .btn-sm{padding:6px 11px;font-size:12.5px;border-radius:8px}
+  .barra-acoes{display:flex;gap:10px;flex-wrap:wrap}
+
+  .tag{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:99px;
+    font-size:11.5px;font-weight:650;white-space:nowrap}
+  .tag::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+  .st-aberta{background:var(--info-soft);color:var(--info)}
+  .st-andamento{background:var(--roxo-soft);color:var(--roxo)}
+  .st-aguardando{background:var(--warn-soft);color:var(--warn)}
+  .st-concluida{background:var(--ok-soft);color:var(--ok)}
+  .st-cancelada{background:var(--neutral-soft);color:var(--muted)}
+  .pr-baixa{background:var(--neutral-soft);color:var(--muted)}
+  .pr-media{background:var(--roxo-soft);color:var(--roxo)}
+  .pr-alta{background:var(--warn-soft);color:var(--warn)}
+  .pr-urgente{background:var(--danger-soft);color:var(--danger)}
+  .selo-atraso{background:var(--danger-soft);color:var(--danger)}
+
+  .rolagem{overflow-x:auto}
+  table{width:100%;border-collapse:collapse;min-width:900px}
+  th,td{padding:11px 14px;text-align:left;border-bottom:1px solid var(--border);vertical-align:middle}
+  th{font-size:11.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);
+    background:var(--surface-2);cursor:pointer;user-select:none;white-space:nowrap}
+  th .seta{opacity:.5;font-size:10px}
+  tbody tr{cursor:pointer}
+  tbody tr:hover{background:var(--surface-2)}
+  td.num{font-weight:700;color:var(--primary);white-space:nowrap}
+  td.titulo-cel{max-width:330px}
+  td.titulo-cel span{display:block;color:var(--muted);font-size:12px;overflow:hidden;
+    text-overflow:ellipsis;white-space:nowrap}
+  .vazio{padding:52px 20px;text-align:center;color:var(--muted)}
+  .vazio .big{font-size:38px;opacity:.5;margin-bottom:8px}
+  .filtros{display:grid;grid-template-columns:2fr repeat(4,1fr) auto;gap:10px;margin-bottom:14px;align-items:end}
+  @media(max-width:980px){.filtros{grid-template-columns:1fr 1fr}}
+  .filtros .campo{margin-bottom:0}
+  .rodape-tabela{display:flex;align-items:center;justify-content:space-between;gap:12px;
+    padding:12px 16px;color:var(--muted);flex-wrap:wrap}
+  .paginacao{display:flex;gap:5px;align-items:center}
+  .paginacao button{min-width:32px;height:32px;border:1px solid var(--border);background:var(--surface);
+    border-radius:8px;cursor:pointer}
+  .paginacao button[disabled]{opacity:.4;cursor:default}
+  .paginacao button.atual{background:var(--primary);border-color:var(--primary);color:#fff}
+
+  .kanban{display:grid;grid-template-columns:repeat(5,minmax(228px,1fr));gap:14px;overflow-x:auto;padding-bottom:8px}
+  @media(max-width:1100px){.kanban{grid-template-columns:repeat(5,265px)}}
+  .coluna{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+    display:flex;flex-direction:column;min-height:210px;overflow:hidden}
+  .coluna[data-status="aberta"]{box-shadow:inset 0 3px 0 var(--ciano)}
+  .coluna[data-status="andamento"]{box-shadow:inset 0 3px 0 var(--roxo)}
+  .coluna[data-status="aguardando"]{box-shadow:inset 0 3px 0 var(--amarelo)}
+  .coluna[data-status="concluida"]{box-shadow:inset 0 3px 0 var(--verde)}
+  .coluna[data-status="cancelada"]{box-shadow:inset 0 3px 0 var(--border)}
+  .coluna h3{padding:12px 14px;font-size:12px;text-transform:uppercase;letter-spacing:.05em;
+    display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border)}
+  .coluna h3 b{background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:1px 8px;font-size:11px}
+  .coluna .lista{padding:10px;display:flex;flex-direction:column;gap:9px;flex:1}
+  .coluna.alvo{outline:2px dashed var(--primary);outline-offset:-3px}
+  .mini{background:var(--surface-2);border:1px solid var(--border);border-radius:10px;padding:11px 12px;
+    cursor:grab;transition:border-color .15s,transform .12s}
+  .mini:hover{border-color:var(--primary);transform:translateY(-1px)}
+  .mini:active{cursor:grabbing}
+  .mini .n{font-size:11.5px;font-weight:700;color:var(--primary)}
+  .mini .t{font-weight:600;margin:3px 0 7px;font-size:13px}
+  .mini .m{display:flex;gap:6px;align-items:center;flex-wrap:wrap;color:var(--muted);font-size:11.5px}
+
+  .barras{display:flex;flex-direction:column;gap:11px;margin-top:6px}
+  .barra-item{display:grid;grid-template-columns:130px 1fr 42px;gap:10px;align-items:center;font-size:13px}
+  .trilho{background:var(--surface-2);border-radius:99px;height:9px;overflow:hidden}
+  .preenche{height:100%;border-radius:99px;background:var(--cor,var(--primary));transition:width .4s}
+  .barra-item b{text-align:right;color:var(--muted);font-weight:600;font-size:12.5px}
+
+  .fundo-modal{position:fixed;inset:0;background:rgba(0,0,0,.72);backdrop-filter:blur(3px);display:none;align-items:flex-start;
+    justify-content:center;padding:34px 16px;z-index:60;overflow:auto}
+  .fundo-modal.aberto{display:flex}
+  .modal{background:var(--surface);border:1px solid var(--border);border-radius:16px;width:100%;
+    max-width:760px;box-shadow:0 24px 70px rgba(0,0,0,.35);animation:sobe .2s ease}
+  .modal-topo{display:flex;align-items:flex-start;gap:12px;padding:18px 20px;border-bottom:1px solid var(--border)}
+  .modal-corpo{padding:20px;max-height:66vh;overflow:auto}
+  .modal-rodape{padding:14px 20px;border-top:1px solid var(--border);display:flex;gap:10px;
+    justify-content:flex-end;flex-wrap:wrap}
+  .fechar{margin-left:auto;background:none;border:0;font-size:22px;line-height:1;cursor:pointer;color:var(--muted)}
+  .fechar:hover{color:var(--danger)}
+  .ficha{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:18px}
+  .ficha div span{display:block;font-size:11.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+  .ficha div b{font-weight:600}
+  .bloco-desc{background:var(--surface-2);border:1px solid var(--border);border-radius:10px;padding:13px;
+    white-space:pre-wrap;margin-bottom:18px}
+  .historico{list-style:none;margin:0;padding:0 0 0 18px;border-left:2px solid var(--border)}
+  .historico li{position:relative;padding:0 0 14px 12px}
+  .historico li::before{content:"";position:absolute;left:-24px;top:5px;width:9px;height:9px;border-radius:50%;
+    background:var(--primary);border:2px solid var(--surface)}
+  .historico time{display:block;color:var(--muted);font-size:11.5px}
+  .aviso{display:flex;gap:10px;align-items:flex-start;background:var(--warn-soft);color:var(--warn);
+    border-radius:10px;padding:11px 13px;font-size:13px;margin-bottom:14px}
+  h2.sec{font-size:12.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:10px}
+
+  #toasts{position:fixed;right:18px;bottom:18px;display:flex;flex-direction:column;gap:9px;z-index:90}
+  .toast{background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--ok);
+    border-radius:10px;padding:11px 15px;box-shadow:var(--shadow);animation:sobe .2s ease;max-width:330px}
+  .toast.erro{border-left-color:var(--danger)}
+  /* ---------- Gráficos (paleta validada p/ daltonismo nos 2 temas) ---------- */
+  :root{
+    --s-criadas:#e6273c; --s-concluidas:#1e9fb4;
+    --g-aberta:#1e9fb4; --g-aguardando:#bd8a12; --g-andamento:#a259f0;
+    --g-concluida:#33a355; --g-cancelada:#6d6a72;
+  }
+  .graf-topo{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;
+    flex-wrap:wrap;margin-bottom:14px}
+  .graf-topo h2{font-size:15px}
+  .graf-topo p{margin:3px 0 0;color:var(--muted);font-size:12.5px}
+  .legenda{display:flex;gap:14px;flex-wrap:wrap;font-size:12.5px;color:var(--muted)}
+  .legenda span{display:inline-flex;align-items:center;gap:6px}
+  .legenda i{width:10px;height:10px;border-radius:3px}
+  .svg-graf{width:100%;height:auto;display:block}
+  .svg-graf text{fill:var(--muted);font-size:11px;font-family:inherit}
+  .svg-graf text.valor{fill:var(--text);font-size:11.5px;font-weight:600}
+  .svg-graf .grade{stroke:var(--border);stroke-dasharray:3 5;stroke-width:1}
+  .svg-graf .base{stroke:var(--border);stroke-width:1}
+  .marca{transition:opacity .12s}
+  .marca:hover{opacity:.8}
+  .rosca-bloco{display:grid;grid-template-columns:170px 1fr;gap:18px;align-items:center}
+  @media(max-width:560px){.rosca-bloco{grid-template-columns:1fr}}
+  .rosca-legenda{display:flex;flex-direction:column;gap:10px}
+  .rosca-item{display:grid;grid-template-columns:11px 1fr auto 44px;gap:10px;align-items:center;font-size:13px}
+  .rosca-item i{width:11px;height:11px;border-radius:3px}
+  .rosca-item b{font-variant-numeric:tabular-nums}
+  .rosca-item em{font-style:normal;color:var(--muted);font-size:12px;text-align:right}
+  .graf-vazio{color:var(--muted);text-align:center;padding:34px 0;font-size:13px}
+  #tipGraf{position:fixed;pointer-events:none;background:var(--surface);border:1px solid var(--border);
+    border-radius:9px;padding:7px 11px;font-size:12.5px;box-shadow:var(--shadow);z-index:80;
+    opacity:0;transition:opacity .1s;white-space:nowrap;color:var(--text)}
+  #tipGraf.on{opacity:1}
+
+  /* ---------- Configurações ---------- */
+  .config-grid{display:grid;grid-template-columns:232px 1fr;gap:16px;align-items:start}
+  @media(max-width:820px){.config-grid{grid-template-columns:1fr}}
+  .config-menu{padding:8px;display:flex;flex-direction:column;gap:3px;position:sticky;top:78px}
+  @media(max-width:820px){.config-menu{position:static;flex-direction:row;overflow-x:auto}}
+  .config-menu button{width:100%;text-align:left;background:none;border:0;padding:10px 12px;border-radius:9px;
+    cursor:pointer;color:var(--muted);font-weight:600;display:flex;align-items:center;gap:10px;white-space:nowrap}
+  .config-menu button span{width:22px;height:22px;display:grid;place-items:center;border-radius:6px;
+    background:var(--surface-2);font-size:12px}
+  .config-menu button:hover{background:var(--surface-2);color:var(--text)}
+  .config-menu button.ativo{background:var(--primary-soft);color:var(--text);
+    box-shadow:inset 0 0 0 1px rgba(230,39,60,.45)}
+  .config-menu button.ativo span{background:var(--primary);color:#fff}
+  .config-sec{display:none}
+  .config-sec.ativa{display:block;animation:sobe .16s ease}
+  .sec-topo{margin-bottom:16px}
+  .sec-topo h2{font-size:17px}
+  .sec-topo p{margin:3px 0 0;color:var(--muted);font-size:13px}
+
+  .segmentos{display:inline-flex;background:var(--surface-2);border:1px solid var(--border);
+    border-radius:10px;padding:3px;gap:3px;margin-bottom:14px;flex-wrap:wrap}
+  .segmentos button{border:0;background:none;padding:7px 15px;border-radius:8px;cursor:pointer;
+    color:var(--muted);font-weight:600;font-size:13px}
+  .segmentos button:hover{color:var(--text)}
+  .segmentos button.ativo{background:var(--primary);color:#fff}
+
+  .add-linha{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+  .add-linha input{flex:1;min-width:180px}
+  .lista-itens{border:1px solid var(--border);border-radius:10px;overflow:hidden}
+  .item-lista{display:flex;align-items:center;gap:12px;padding:9px 14px;border-bottom:1px solid var(--border)}
+  .item-lista:last-child{border-bottom:0}
+  .item-lista:hover{background:var(--surface-2)}
+  .item-lista .nome{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .item-lista .uso{margin-left:auto;color:var(--muted);font-size:12px;white-space:nowrap}
+  .item-lista .acoes{display:flex;gap:6px}
+  .item-lista input{flex:1;min-width:120px;padding:6px 10px}
+  .fixo{font-size:10.5px;color:var(--muted);border:1px dashed var(--border);border-radius:99px;
+    padding:1px 8px;text-transform:uppercase;letter-spacing:.04em}
+  .mini-btn{width:30px;height:30px;border:1px solid var(--border);background:var(--surface);border-radius:8px;
+    cursor:pointer;display:grid;place-items:center;font-size:12.5px;color:var(--muted)}
+  .mini-btn:hover{border-color:var(--primary);color:var(--primary)}
+  .mini-btn.perigo:hover{border-color:var(--danger);color:var(--danger)}
+  .mini-btn:disabled{opacity:.3;cursor:not-allowed}
+
+  .destaque{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;
+    background:var(--surface-2);border:1px solid var(--border);border-radius:10px;padding:14px;margin-top:4px}
+  .destaque span{display:block;font-size:11.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+  .destaque b{font-size:17px;color:var(--primary)}
+  .acao-bloco{display:flex;gap:16px;align-items:center;justify-content:space-between;
+    padding:13px 0;border-bottom:1px solid var(--border);flex-wrap:wrap}
+  .acao-bloco:last-child{border-bottom:0;padding-bottom:0}
+  .acao-bloco:first-of-type{padding-top:0}
+  .acao-bloco p{margin:2px 0 0;color:var(--muted);font-size:12.5px;max-width:52ch}
+  .zona-perigo{border-color:rgba(255,45,126,.4)}
+  .zona-perigo .sec-topo h2{color:var(--danger)}
+
+  .chips{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:10px}
+  .chip{background:var(--surface-2);border:1px solid var(--border);border-radius:99px;padding:4px 10px;
+    display:flex;align-items:center;gap:7px;font-size:12.5px}
+  .chip button{background:none;border:0;color:var(--muted);cursor:pointer;font-size:14px;line-height:1}
+  .chip button:hover{color:var(--danger)}
+
+  @media print{
+    header.topo,.modal-rodape,.fechar,#toasts,main{display:none!important}
+    .fundo-modal{position:static;background:none;padding:0;display:block;backdrop-filter:none}
+    .modal{max-width:none;border:0;box-shadow:none;background:#fff}
+    .modal-corpo{max-height:none;overflow:visible}
+    html,body{background:#fff!important;background-image:none!important;color:#000!important}
+    .modal *,.ficha div b,.bloco-desc,.historico li{color:#000!important}
+    .bloco-desc,.tag{background:#f2f2f2!important;border-color:#bbb!important}
+    .ficha div span,.historico time,h2.sec{color:#555!important}
+  }
+</style>
+</head>
+<body>
+
+<header class="topo">
+  <div class="topo-in">
+    <div class="logo">
+      <div class="mark">&lt;/&gt;</div>
+      <div>
+        <strong><span class="texto-grad">OD</span> · Ordem de Demandas</strong>
+        <small id="rotuloOrg">HeuCode</small>
+      </div>
+    </div>
+    <nav class="abas" id="abas">
+      <button data-pagina="painel" aria-current="page">Painel</button>
+      <button data-pagina="demandas">Demandas</button>
+      <button data-pagina="nova">Nova OD</button>
+      <button data-pagina="analise">Análise</button>
+      <button data-pagina="config">Configurações</button>
+    </nav>
+    <button class="icone-btn" id="btnTema" title="Alternar tema">◐</button>
+  </div>
+</header>
+
+<main>
+
+  <!-- ============ PAINEL ============ -->
+  <section class="pagina ativa" id="pg-painel">
+    <div class="cabecalho-pagina">
+      <div><h1>Painel</h1><p id="resumoData"></p></div>
+      <div class="barra-acoes"><button class="btn btn-primario" data-ir="nova">+ Nova OD</button></div>
+    </div>
+    <div class="grade-kpi" id="kpis"></div>
+    <div class="grade-2">
+      <div class="cartao cartao-pad">
+        <h2 class="sec">Demandas recentes</h2>
+        <div class="rolagem"><table id="tabelaRecentes"><tbody></tbody></table></div>
+      </div>
+      <div>
+        <div class="cartao cartao-pad" style="margin-bottom:16px">
+          <h2 class="sec">Por situação</h2>
+          <div class="barras" id="graficoStatus"></div>
+        </div>
+        <div class="cartao cartao-pad">
+          <h2 class="sec">Por sistema</h2>
+          <div class="barras" id="graficoSistema"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ DEMANDAS ============ -->
+  <section class="pagina" id="pg-demandas">
+    <div class="cabecalho-pagina">
+      <div><h1>Demandas</h1><p>Consulte, filtre e acompanhe todas as ordens registradas.</p></div>
+      <div class="barra-acoes">
+        <button class="btn" id="btnCsv">Exportar CSV</button>
+        <button class="btn btn-primario" data-ir="nova">+ Nova OD</button>
+      </div>
+    </div>
+
+    <div class="filtros">
+      <div class="campo"><label for="fBusca">Buscar</label>
+        <input type="search" id="fBusca" placeholder="Número, título, solicitante..."></div>
+      <div class="campo"><label for="fStatus">Situação</label><select id="fStatus"></select></div>
+      <div class="campo"><label for="fPrioridade">Prioridade</label><select id="fPrioridade"></select></div>
+      <div class="campo"><label for="fSistema">Sistema</label><select id="fSistema"></select></div>
+      <div class="campo"><label for="fResponsavel">Responsável</label><select id="fResponsavel"></select></div>
+      <button class="btn" id="btnLimpar">Limpar</button>
+    </div>
+
+    <div class="cartao">
+      <div class="rolagem">
+        <table id="tabela">
+          <thead><tr>
+            <th data-ord="numero">OD <span class="seta"></span></th>
+            <th data-ord="titulo">Título <span class="seta"></span></th>
+            <th data-ord="sistema">Sistema <span class="seta"></span></th>
+            <th data-ord="responsavel">Responsável <span class="seta"></span></th>
+            <th data-ord="prioridade">Prioridade <span class="seta"></span></th>
+            <th data-ord="status">Situação <span class="seta"></span></th>
+            <th data-ord="criadaEm">Abertura <span class="seta"></span></th>
+          </tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="rodape-tabela">
+        <span id="contagem"></span>
+        <div class="paginacao" id="paginacao"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ NOVA / EDITAR ============ -->
+  <section class="pagina" id="pg-nova">
+    <div class="cabecalho-pagina">
+      <div><h1 id="tituloForm">Nova Ordem de Demanda</h1>
+        <p id="subtituloForm">Preencha os dados para registrar a demanda.</p></div>
+    </div>
+    <form class="cartao cartao-pad" id="formOD" novalidate style="max-width:900px">
+      <input type="hidden" id="fId">
+      <div class="campo">
+        <label for="cTitulo">Título da demanda *</label>
+        <input type="text" id="cTitulo" maxlength="120" placeholder="Ex.: Erro ao gerar boleto no fechamento mensal">
+        <div class="msg-erro" id="erroTitulo"></div>
+      </div>
+      <div class="campo">
+        <label for="cDescricao">Descrição / objeto *</label>
+        <textarea id="cDescricao" placeholder="Descreva o problema ou a solicitação, o impacto e como reproduzir, se for o caso."></textarea>
+        <div class="msg-erro" id="erroDescricao"></div>
+      </div>
+      <div class="linha">
+        <div class="campo"><label for="cSolicitante">Solicitante *</label>
+          <select id="cSolicitante"></select>
+          <div class="msg-erro" id="erroSolicitante"></div></div>
+        <div class="campo"><label for="cSistema">Tem ligação com sistema existente? *</label>
+          <select id="cSistema"></select>
+          <div class="dica">Selecione o sistema afetado ou "Não — demanda nova".</div>
+          <div class="msg-erro" id="erroSistema"></div></div>
+      </div>
+      <div class="linha">
+        <div class="campo"><label for="cResponsavel">Responsável</label><select id="cResponsavel"></select></div>
+        <div class="campo"><label for="cPrioridade">Prioridade</label><select id="cPrioridade"></select></div>
+      </div>
+      <div class="campo" style="max-width:calc(50% - 7px)">
+        <label for="cStatus">Situação</label><select id="cStatus"></select>
+      </div>
+      <div class="campo"><label for="cObs">Observação inicial</label>
+        <input type="text" id="cObs" maxlength="160" placeholder="Opcional — registrada no histórico"></div>
+      <div class="barra-acoes" style="margin-top:6px">
+        <button type="submit" class="btn btn-primario">Salvar OD</button>
+        <button type="button" class="btn" id="btnCancelarForm">Cancelar</button>
+      </div>
+    </form>
+  </section>
+
+  <!-- ============ ANÁLISE ============ -->
+  <section class="pagina" id="pg-analise">
+    <div class="cabecalho-pagina">
+      <div><h1>Análise</h1><p>Indicadores, evolução e distribuição das ordens de demanda.</p></div>
+      <div class="barra-acoes">
+        <select id="fPeriodo" style="width:auto">
+          <option value="6">Últimos 6 meses</option>
+          <option value="12">Últimos 12 meses</option>
+          <option value="0">Todo o período</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="grade-kpi" id="kpisAnalise"></div>
+
+    <div class="cartao cartao-pad" style="margin-bottom:16px">
+      <div class="graf-topo">
+        <div><h2>Aberturas e conclusões por mês</h2>
+          <p>Quantas OD entraram e quantas foram finalizadas em cada mês.</p></div>
+        <div class="legenda">
+          <span><i style="background:var(--s-criadas)"></i>Abertas</span>
+          <span><i style="background:var(--s-concluidas)"></i>Concluídas</span>
+        </div>
+      </div>
+      <div id="grafMeses"></div>
+    </div>
+
+    <div class="grade-2" style="margin-bottom:16px">
+      <div class="cartao cartao-pad">
+        <div class="graf-topo"><div><h2>Distribuição por situação</h2>
+          <p>Onde estão as demandas do período.</p></div></div>
+        <div class="rosca-bloco">
+          <div id="grafRosca"></div>
+          <div class="rosca-legenda" id="legRosca"></div>
+        </div>
+      </div>
+      <div class="cartao cartao-pad">
+        <div class="graf-topo"><div><h2>Por prioridade</h2>
+          <p>Volume registrado em cada nível.</p></div></div>
+        <div id="grafPrioridade"></div>
+      </div>
+    </div>
+
+    <div class="grade-2" style="margin-bottom:22px">
+      <div class="cartao cartao-pad">
+        <div class="graf-topo"><div><h2>Sistemas mais demandados</h2>
+          <p>Top 8 vínculos informados no cadastro.</p></div></div>
+        <div id="grafSistemas"></div>
+      </div>
+      <div class="cartao cartao-pad">
+        <div class="graf-topo">
+          <div><h2>Carga por responsável</h2><p>Em aberto e já concluídas.</p></div>
+          <div class="legenda">
+            <span><i style="background:var(--s-criadas)"></i>Em aberto</span>
+            <span><i style="background:var(--s-concluidas)"></i>Concluídas</span>
+          </div>
+        </div>
+        <div id="grafResponsaveis"></div>
+      </div>
+    </div>
+
+    <div class="cabecalho-pagina" style="margin-bottom:12px">
+      <div><h2 style="font-size:17px">Quadro de situação</h2>
+        <p style="color:var(--muted);margin:2px 0 0">Arraste os cartões para mudar a situação da demanda.</p></div>
+    </div>
+    <div class="kanban" id="kanban"></div>
+  </section>
+
+  <!-- ============ CONFIG ============ -->
+  <section class="pagina" id="pg-config">
+    <div class="cabecalho-pagina">
+      <div><h1>Configurações</h1><p>Listas auxiliares, dados e backup do sistema.</p></div>
+    </div>
+    <div class="config-grid">
+      <aside class="config-menu cartao" id="menuConfig">
+        <button data-sec="listas" class="ativo"><span>≡</span> Listas auxiliares</button>
+        <button data-sec="identidade"><span>#</span> Identificação</button>
+        <button data-sec="dados"><span>⛃</span> Dados e backup</button>
+      </aside>
+
+      <div>
+        <!-- Listas auxiliares -->
+        <section class="config-sec ativa" id="sec-listas">
+          <div class="cartao cartao-pad">
+            <div class="sec-topo">
+              <div><h2 id="listaTitulo"></h2><p id="listaDesc"></p></div>
+            </div>
+            <div class="segmentos" id="segLista">
+              <button data-lista="sistemas" class="ativo">Sistemas</button>
+              <button data-lista="solicitantes">Solicitantes</button>
+              <button data-lista="responsaveis">Responsáveis</button>
+            </div>
+            <div class="add-linha">
+              <input type="text" id="novoItem" maxlength="60">
+              <button class="btn btn-primario" id="btnAddItem">Adicionar</button>
+            </div>
+            <div class="lista-itens" id="listaItens"></div>
+            <p class="dica" style="margin:12px 0 0">Renomear atualiza automaticamente todas as demandas
+              que usam o item. Itens em uso não podem ser excluídos.</p>
+          </div>
+        </section>
+
+        <!-- Identificação -->
+        <section class="config-sec" id="sec-identidade">
+          <div class="cartao cartao-pad">
+            <div class="sec-topo"><div><h2>Identificação</h2>
+              <p>Como o sistema se apresenta e como as ordens são numeradas.</p></div></div>
+            <div class="linha">
+              <div class="campo"><label for="cOrg">Nome do órgão / empresa</label>
+                <input type="text" id="cOrg" maxlength="60"></div>
+              <div class="campo"><label for="cPrefixo">Prefixo do número</label>
+                <input type="text" id="cPrefixo" maxlength="6" placeholder="OD">
+                <div class="dica">Somente letras e números.</div></div>
+            </div>
+            <div class="destaque">
+              <div><span>Próxima OD a ser gerada</span><b id="previaNumero"></b></div>
+              <div><span>Total registrado</span><b id="previaTotal"></b></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Dados -->
+        <section class="config-sec" id="sec-dados">
+          <div class="cartao cartao-pad" style="margin-bottom:16px">
+            <div class="sec-topo"><div><h2>Dados e backup</h2>
+              <p>Tudo fica salvo apenas neste navegador. Exporte com regularidade.</p></div></div>
+            <div class="acao-bloco">
+              <div><b>Exportar backup</b><p>Baixa um arquivo .json com demandas, listas e configurações.</p></div>
+              <button class="btn" id="btnExportar">Exportar</button>
+            </div>
+            <div class="acao-bloco">
+              <div><b>Importar backup</b><p>Substitui todos os dados atuais pelos do arquivo escolhido.</p></div>
+              <button class="btn" id="btnImportar">Importar</button>
+            </div>
+            <div class="acao-bloco">
+              <div><b>Carregar exemplos</b><p>Cria seis demandas fictícias para testar o sistema.</p></div>
+              <button class="btn" id="btnExemplo">Carregar</button>
+            </div>
+            <input type="file" id="arquivoImport" accept="application/json" hidden>
+          </div>
+          <div class="cartao cartao-pad zona-perigo">
+            <div class="sec-topo"><div><h2>Zona de risco</h2>
+              <p>Ações irreversíveis. Faça um backup antes de continuar.</p></div></div>
+            <div class="acao-bloco">
+              <div><b>Apagar todas as demandas</b><p>Remove os registros e zera a numeração. As listas são mantidas.</p></div>
+              <button class="btn btn-perigo" id="btnApagar">Apagar tudo</button>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ============ MODAL DETALHE ============ -->
+<div class="fundo-modal" id="modal">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitulo">
+    <div class="modal-topo">
+      <div>
+        <div style="color:var(--primary);font-weight:700;font-size:12.5px" id="modalNumero"></div>
+        <h2 id="modalTitulo" style="font-size:19px"></h2>
+      </div>
+      <button class="fechar" id="btnFecharModal" aria-label="Fechar">&times;</button>
+    </div>
+    <div class="modal-corpo" id="modalCorpo"></div>
+    <div class="modal-rodape">
+      <button class="btn btn-perigo btn-sm" id="btnExcluir">Excluir</button>
+      <button class="btn btn-sm" id="btnImprimir">Imprimir</button>
+      <button class="btn btn-sm" id="btnEditar">Editar</button>
+      <button class="btn btn-primario btn-sm" id="btnAvancar">Avançar situação</button>
+    </div>
+  </div>
+</div>
+
+<div id="toasts"></div>
+
+<script>
+(function(){
+"use strict";
+
+/* ===================== Constantes ===================== */
+var CHAVE = "od.dados.v1";
+
+var STATUS = [
+  {id:"aberta",      nome:"Aberta",       classe:"st-aberta",     cor:"var(--info)"},
+  {id:"andamento",   nome:"Em andamento", classe:"st-andamento",  cor:"var(--roxo)"},
+  {id:"aguardando",  nome:"Aguardando",   classe:"st-aguardando", cor:"var(--warn)"},
+  {id:"concluida",   nome:"Concluída",    classe:"st-concluida",  cor:"var(--ok)"},
+  {id:"cancelada",   nome:"Cancelada",    classe:"st-cancelada",  cor:"var(--muted)"}
+];
+var PRIORIDADES = [
+  {id:"baixa",   nome:"Baixa",   classe:"pr-baixa",   peso:1},
+  {id:"media",   nome:"Média",   classe:"pr-media",   peso:2},
+  {id:"alta",    nome:"Alta",    classe:"pr-alta",    peso:3},
+  {id:"urgente", nome:"Urgente", classe:"pr-urgente", peso:4}
+];
+var ABERTOS = ["aberta","andamento","aguardando"];
+var PALETA_GRAF = ["var(--vermelho)","var(--rosa)","var(--roxo)","var(--azul)","var(--ciano)","var(--verde)","var(--amarelo)","var(--laranja)"];
+
+/* ===================== Estado ===================== */
+var SEM_SISTEMA = "Não — demanda nova";
+var dados = {
+  org:"HeuCode",
+  prefixo:"OD",
+  sistemas:[SEM_SISTEMA,"Sistema Financeiro","Portal Web","Aplicativo Mobile","Intranet","API / Integração"],
+  solicitantes:["Cliente","Equipe interna","Diretoria","Suporte"],
+  responsaveis:["Não atribuído"],
+  demandas:[],
+  sequencias:{}
+};
+var filtros = {busca:"",status:"",prioridade:"",sistema:"",responsavel:""};
+var ordem = {campo:"numero", desc:true};
+var pagina = 1, POR_PAGINA = 10;
+var idAberto = null;
+
+/* ===================== Utilidades ===================== */
+function $(s){ return document.querySelector(s); }
+function $$(s){ return Array.prototype.slice.call(document.querySelectorAll(s)); }
+function esc(v){
+  return String(v==null?"":v).replace(/[&<>"']/g, function(c){
+    return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];
+  });
+}
+function statusDe(id){ for(var i=0;i<STATUS.length;i++){ if(STATUS[i].id===id) return STATUS[i]; } return STATUS[0]; }
+function prioridadeDe(id){ for(var i=0;i<PRIORIDADES.length;i++){ if(PRIORIDADES[i].id===id) return PRIORIDADES[i]; } return PRIORIDADES[1]; }
+function hoje(){ var d=new Date(); d.setHours(0,0,0,0); return d; }
+function dataBR(iso){
+  if(!iso) return "—";
+  var p = String(iso).slice(0,10).split("-");
+  if(p.length!==3) return "—";
+  return p[2]+"/"+p[1]+"/"+p[0];
+}
+function dataHoraBR(iso){
+  if(!iso) return "";
+  var d = new Date(iso);
+  if(isNaN(d)) return "";
+  function z(n){ return n<10?"0"+n:""+n; }
+  return z(d.getDate())+"/"+z(d.getMonth()+1)+"/"+d.getFullYear()+" às "+z(d.getHours())+":"+z(d.getMinutes());
+}
+function diasDesde(iso){
+  var d = new Date(iso);
+  if(isNaN(d)) return null;
+  d.setHours(0,0,0,0);
+  return Math.round((hoje() - d)/86400000);
+}
+function toast(msg, tipo){
+  var el = document.createElement("div");
+  el.className = "toast" + (tipo==="erro" ? " erro" : "");
+  el.textContent = msg;
+  $("#toasts").appendChild(el);
+  setTimeout(function(){
+    el.style.transition="opacity .3s"; el.style.opacity="0";
+    setTimeout(function(){ if(el.parentNode) el.parentNode.removeChild(el); },300);
+  }, 3200);
+}
+
+/* ===================== Persistência ===================== */
+function salvar(){
+  try{ localStorage.setItem(CHAVE, JSON.stringify(dados)); }
+  catch(e){ toast("Não foi possível salvar neste navegador.","erro"); }
+}
+function carregar(){
+  try{
+    var bruto = localStorage.getItem(CHAVE);
+    if(!bruto) return;
+    var obj = JSON.parse(bruto);
+    if(obj && typeof obj === "object"){
+      if(typeof obj.org === "string") dados.org = obj.org;
+      if(typeof obj.prefixo === "string" && obj.prefixo) dados.prefixo = obj.prefixo;
+      var listaSis = obj.sistemas || obj.setores;   /* migra "setores" da versão anterior */
+      if(Array.isArray(listaSis) && listaSis.length) dados.sistemas = listaSis;
+      if(Array.isArray(obj.solicitantes) && obj.solicitantes.length) dados.solicitantes = obj.solicitantes;
+      if(Array.isArray(obj.responsaveis) && obj.responsaveis.length) dados.responsaveis = obj.responsaveis;
+      if(Array.isArray(obj.demandas)) dados.demandas = obj.demandas;
+      if(obj.sequencias && typeof obj.sequencias === "object") dados.sequencias = obj.sequencias;
+      migrar();
+    }
+  }catch(e){ toast("Dados salvos estavam corrompidos e foram ignorados.","erro"); }
+}
+/* Compatibiliza registros antigos: setor -> sistema, remove prazo, garante listas. */
+function migrar(){
+  if(dados.sistemas.indexOf(SEM_SISTEMA) === -1) dados.sistemas.unshift(SEM_SISTEMA);
+  dados.demandas.forEach(function(d){
+    if(!d.sistema) d.sistema = d.setor || SEM_SISTEMA;
+    delete d.setor; delete d.prazo;
+    if(!d.solicitante) d.solicitante = dados.solicitantes[0];
+    if(dados.sistemas.indexOf(d.sistema) === -1) dados.sistemas.push(d.sistema);
+    if(dados.solicitantes.indexOf(d.solicitante) === -1) dados.solicitantes.push(d.solicitante);
+    if(dados.responsaveis.indexOf(d.responsavel) === -1) dados.responsaveis.push(d.responsavel);
+  });
+}
+function proximoNumero(){
+  var ano = new Date().getFullYear();
+  var seq = (dados.sequencias[ano] || 0) + 1;
+  dados.sequencias[ano] = seq;
+  var s = String(seq);
+  while(s.length < 4) s = "0" + s;
+  return dados.prefixo + "-" + ano + "-" + s;
+}
+function novoId(){
+  return "od_" + Date.now().toString(36) + Math.random().toString(36).slice(2,7);
+}
+function acharDemanda(id){
+  for(var i=0;i<dados.demandas.length;i++){ if(dados.demandas[i].id===id) return dados.demandas[i]; }
+  return null;
+}
+function registrar(d, texto){
+  d.historico = d.historico || [];
+  d.historico.push({em:new Date().toISOString(), texto:texto});
+}
+
+/* ===================== Navegação ===================== */
+function irPara(nome){
+  $$(".pagina").forEach(function(s){ s.classList.toggle("ativa", s.id === "pg-"+nome); });
+  $$("#abas button").forEach(function(b){
+    if(b.dataset.pagina === nome) b.setAttribute("aria-current","page");
+    else b.removeAttribute("aria-current");
+  });
+  window.scrollTo(0,0);
+  if(nome==="painel") renderPainel();
+  if(nome==="demandas") renderTabela();
+  if(nome==="analise"){ renderAnalise(); renderKanban(); }
+  if(nome==="config") renderConfig();
+}
+
+/* ===================== Selects ===================== */
+function preencherSelect(sel, itens, incluirTodos, rotuloTodos){
+  var html = incluirTodos ? '<option value="">'+esc(rotuloTodos||"Todos")+'</option>' : "";
+  for(var i=0;i<itens.length;i++){
+    html += '<option value="'+esc(itens[i].valor)+'">'+esc(itens[i].nome)+'</option>';
+  }
+  sel.innerHTML = html;
+}
+function listaStatus(){ return STATUS.map(function(s){ return {valor:s.id, nome:s.nome}; }); }
+function listaPrioridades(){ return PRIORIDADES.map(function(p){ return {valor:p.id, nome:p.nome}; }); }
+function listaTexto(arr){ return arr.map(function(t){ return {valor:t, nome:t}; }); }
+
+function montarSelects(){
+  preencherSelect($("#fStatus"), listaStatus(), true);
+  preencherSelect($("#fPrioridade"), listaPrioridades(), true);
+  preencherSelect($("#fSistema"), listaTexto(dados.sistemas), true);
+  preencherSelect($("#fResponsavel"), listaTexto(dados.responsaveis), true);
+  preencherSelect($("#cStatus"), listaStatus(), false);
+  preencherSelect($("#cPrioridade"), listaPrioridades(), false);
+  preencherSelect($("#cSolicitante"), listaTexto(dados.solicitantes), true, "Selecione...");
+  preencherSelect($("#cSistema"), listaTexto(dados.sistemas), true, "Selecione...");
+  preencherSelect($("#cResponsavel"), listaTexto(dados.responsaveis), false);
+  $("#fStatus").value = filtros.status;
+  $("#fPrioridade").value = filtros.prioridade;
+  $("#fSistema").value = filtros.sistema;
+  $("#fResponsavel").value = filtros.responsavel;
+}
+
+/* ===================== Painel ===================== */
+function renderPainel(){
+  var total = dados.demandas.length;
+  var abertas = 0, andamento = 0, urgentes = 0, concluidasMes = 0;
+  var agora = new Date();
+  dados.demandas.forEach(function(d){
+    if(d.status==="aberta") abertas++;
+    if(d.status==="andamento") andamento++;
+    if(d.prioridade==="urgente" && ABERTOS.indexOf(d.status)!==-1) urgentes++;
+    if(d.status==="concluida" && d.concluidaEm){
+      var c = new Date(d.concluidaEm);
+      if(c.getFullYear()===agora.getFullYear() && c.getMonth()===agora.getMonth()) concluidasMes++;
+    }
+  });
+  var kpis = [
+    {rot:"Total de OD", val:total, sub:"registradas no sistema", cor:"var(--primary)"},
+    {rot:"Abertas", val:abertas, sub:"aguardando início", cor:"var(--info)"},
+    {rot:"Em andamento", val:andamento, sub:"sendo atendidas", cor:"var(--warn)"},
+    {rot:"Urgentes", val:urgentes, sub:"prioridade máxima em aberto", cor:"var(--danger)"},
+    {rot:"Concluídas no mês", val:concluidasMes, sub:"finalizadas", cor:"var(--ok)"}
+  ];
+  $("#kpis").innerHTML = kpis.map(function(k){
+    return '<div class="kpi" style="--cor:'+k.cor+'"><div class="rot">'+esc(k.rot)+'</div>'+
+           '<div class="val">'+k.val+'</div><div class="sub">'+esc(k.sub)+'</div></div>';
+  }).join("");
+
+  var dt = new Date();
+  var meses = ["janeiro","fevereiro","março","abril","maio","junho","julho","agosto","setembro","outubro","novembro","dezembro"];
+  $("#resumoData").textContent = "Situação em " + dt.getDate() + " de " + meses[dt.getMonth()] + " de " + dt.getFullYear() + ".";
+
+  // Recentes
+  var recentes = dados.demandas.slice().sort(function(a,b){
+    return (b.criadaEm||"").localeCompare(a.criadaEm||"");
+  }).slice(0,7);
+  var tb = $("#tabelaRecentes").querySelector("tbody");
+  if(!recentes.length){
+    tb.innerHTML = '<tr><td class="vazio"><div class="big">📋</div>Nenhuma demanda registrada ainda.</td></tr>';
+  } else {
+    tb.innerHTML = recentes.map(function(d){
+      return '<tr data-id="'+esc(d.id)+'">'+
+        '<td class="num">'+esc(d.numero)+'</td>'+
+        '<td class="titulo-cel"><b>'+esc(d.titulo)+'</b><span>'+esc(d.sistema)+' • '+esc(d.solicitante)+'</span></td>'+
+        '<td>'+etiquetaPrioridade(d)+'</td>'+
+        '<td>'+etiquetaStatus(d)+'</td></tr>';
+    }).join("");
+    Array.prototype.forEach.call(tb.querySelectorAll("tr"), function(tr){
+      tr.addEventListener("click", function(){ abrirModal(tr.dataset.id); });
+    });
+  }
+
+  desenharBarras($("#graficoStatus"), STATUS.map(function(s){
+    return {nome:s.nome, valor:contar(function(d){ return d.status===s.id; }), cor:s.cor};
+  }));
+  var porSistema = dados.sistemas.map(function(s){
+    return {nome:s, valor:contar(function(d){ return d.sistema===s; })};
+  }).filter(function(x){ return x.valor>0; })
+    .sort(function(a,b){ return b.valor-a.valor; }).slice(0,7)
+    .map(function(x,i){ x.cor = PALETA_GRAF[i % PALETA_GRAF.length]; return x; });
+  desenharBarras($("#graficoSistema"), porSistema);
+}
+function contar(fn){ var n=0; dados.demandas.forEach(function(d){ if(fn(d)) n++; }); return n; }
+function desenharBarras(alvo, itens){
+  if(!itens.length){ alvo.innerHTML = '<p style="color:var(--muted);margin:0">Sem dados.</p>'; return; }
+  var max = itens.reduce(function(m,i){ return Math.max(m,i.valor); },0) || 1;
+  alvo.innerHTML = itens.map(function(i){
+    return '<div class="barra-item"><span>'+esc(i.nome)+'</span>'+
+      '<div class="trilho"><div class="preenche" style="--cor:'+i.cor+';width:'+(i.valor/max*100)+'%"></div></div>'+
+      '<b>'+i.valor+'</b></div>';
+  }).join("");
+}
+
+/* ===================== Etiquetas ===================== */
+function etiquetaStatus(d){
+  var s = statusDe(d.status);
+  return '<span class="tag '+s.classe+'">'+esc(s.nome)+'</span>';
+}
+function etiquetaPrioridade(d){
+  var p = prioridadeDe(d.prioridade);
+  return '<span class="tag '+p.classe+'">'+esc(p.nome)+'</span>';
+}
+function celulaAbertura(d){
+  var n = diasDesde(d.criadaEm);
+  var txt = dataBR(d.criadaEm);
+  if(ABERTOS.indexOf(d.status) !== -1 && n !== null && n >= 30)
+    return '<span class="tag selo-atraso">'+txt+' • '+n+'d em aberto</span>';
+  return txt + (n !== null && n > 0 ? ' <span style="color:var(--muted)">• '+n+'d</span>' : '');
+}
+
+/* ===================== Lista / filtros ===================== */
+function filtrar(){
+  var b = filtros.busca.trim().toLowerCase();
+  return dados.demandas.filter(function(d){
+    if(filtros.status && d.status !== filtros.status) return false;
+    if(filtros.prioridade && d.prioridade !== filtros.prioridade) return false;
+    if(filtros.sistema && d.sistema !== filtros.sistema) return false;
+    if(filtros.responsavel && d.responsavel !== filtros.responsavel) return false;
+    if(b){
+      var alvo = [d.numero,d.titulo,d.descricao,d.solicitante,d.sistema,d.responsavel].join(" ").toLowerCase();
+      if(alvo.indexOf(b) === -1) return false;
+    }
+    return true;
+  });
+}
+function ordenar(lista){
+  var c = ordem.campo, sinal = ordem.desc ? -1 : 1;
+  return lista.slice().sort(function(a,b){
+    var va, vb;
+    if(c === "prioridade"){ va = prioridadeDe(a.prioridade).peso; vb = prioridadeDe(b.prioridade).peso; }
+    else if(c === "status"){
+      va = STATUS.findIndex(function(s){ return s.id===a.status; });
+      vb = STATUS.findIndex(function(s){ return s.id===b.status; });
+    }
+    else { va = String(a[c]||"").toLowerCase(); vb = String(b[c]||"").toLowerCase(); }
+    if(va < vb) return -1*sinal;
+    if(va > vb) return 1*sinal;
+    return 0;
+  });
+}
+function renderTabela(){
+  var lista = ordenar(filtrar());
+  var totalPag = Math.max(1, Math.ceil(lista.length / POR_PAGINA));
+  if(pagina > totalPag) pagina = totalPag;
+  var fatia = lista.slice((pagina-1)*POR_PAGINA, pagina*POR_PAGINA);
+  var tb = $("#tabela").querySelector("tbody");
+
+  if(!lista.length){
+    tb.innerHTML = '<tr><td colspan="7" class="vazio"><div class="big">🔎</div>'+
+      (dados.demandas.length ? "Nenhuma demanda corresponde aos filtros." : "Nenhuma demanda registrada. Crie a primeira OD.")+
+      '</td></tr>';
+  } else {
+    tb.innerHTML = fatia.map(function(d){
+      return '<tr data-id="'+esc(d.id)+'">'+
+        '<td class="num">'+esc(d.numero)+'</td>'+
+        '<td class="titulo-cel"><b>'+esc(d.titulo)+'</b><span>'+esc(String(d.descricao).slice(0,90))+'</span></td>'+
+        '<td>'+esc(d.sistema)+'</td>'+
+        '<td>'+esc(d.responsavel)+'</td>'+
+        '<td>'+etiquetaPrioridade(d)+'</td>'+
+        '<td>'+etiquetaStatus(d)+'</td>'+
+        '<td>'+celulaAbertura(d)+'</td></tr>';
+    }).join("");
+    Array.prototype.forEach.call(tb.querySelectorAll("tr"), function(tr){
+      tr.addEventListener("click", function(){ abrirModal(tr.dataset.id); });
+    });
+  }
+
+  $("#contagem").textContent = lista.length
+    ? "Exibindo " + ((pagina-1)*POR_PAGINA+1) + "–" + Math.min(pagina*POR_PAGINA, lista.length) + " de " + lista.length + " demanda(s)"
+    : "0 demanda(s)";
+
+  var html = '<button '+(pagina===1?"disabled":"")+' data-p="'+(pagina-1)+'">‹</button>';
+  for(var i=1;i<=totalPag;i++){
+    if(totalPag>7 && i>2 && i<totalPag-1 && Math.abs(i-pagina)>1){
+      if(i===3) html += '<span style="padding:0 4px">…</span>';
+      continue;
+    }
+    html += '<button class="'+(i===pagina?"atual":"")+'" data-p="'+i+'">'+i+'</button>';
+  }
+  html += '<button '+(pagina===totalPag?"disabled":"")+' data-p="'+(pagina+1)+'">›</button>';
+  $("#paginacao").innerHTML = html;
+  Array.prototype.forEach.call($("#paginacao").querySelectorAll("button[data-p]"), function(b){
+    b.addEventListener("click", function(){
+      var p = parseInt(b.dataset.p,10);
+      if(p>=1 && p<=totalPag){ pagina = p; renderTabela(); }
+    });
+  });
+
+  $$("#tabela th").forEach(function(th){
+    var s = th.querySelector(".seta");
+    if(s) s.textContent = (th.dataset.ord === ordem.campo) ? (ordem.desc ? "▼" : "▲") : "";
+  });
+}
+
+/* ===================== Análise ===================== */
+var MES_CURTO = ["jan","fev","mar","abr","mai","jun","jul","ago","set","out","nov","dez"];
+var COR_STATUS_GRAF = {aberta:"var(--g-aberta)", andamento:"var(--g-andamento)",
+  aguardando:"var(--g-aguardando)", concluida:"var(--g-concluida)", cancelada:"var(--g-cancelada)"};
+
+function mesesDoPeriodo(){
+  var n = parseInt($("#fPeriodo").value, 10);
+  if(!n){
+    var maisAntiga = dados.demandas.reduce(function(m,d){
+      var t = new Date(d.criadaEm).getTime();
+      return (!m || t < m) ? t : m;
+    }, 0);
+    if(!maisAntiga) return 6;
+    var a = new Date(maisAntiga), hj = new Date();
+    n = (hj.getFullYear()-a.getFullYear())*12 + (hj.getMonth()-a.getMonth()) + 1;
+    n = Math.max(3, Math.min(24, n));
+  }
+  return n;
+}
+function inicioPeriodo(n){
+  var d = new Date();
+  d.setDate(1); d.setHours(0,0,0,0);
+  d.setMonth(d.getMonth() - (n-1));
+  return d;
+}
+function noPeriodo(d, ini){ return new Date(d.criadaEm) >= ini; }
+
+function renderAnalise(){
+  var n = mesesDoPeriodo(), ini = inicioPeriodo(n);
+  var lista = dados.demandas.filter(function(d){ return noPeriodo(d, ini); });
+
+  /* --- Indicadores (números-título, não gráficos) --- */
+  var concluidas = lista.filter(function(d){ return d.status === "concluida"; });
+  var taxa = lista.length ? Math.round(concluidas.length / lista.length * 100) : 0;
+  var tempos = concluidas.filter(function(d){ return d.concluidaEm; }).map(function(d){
+    return Math.max(0, (new Date(d.concluidaEm) - new Date(d.criadaEm)) / 86400000);
+  });
+  var media = tempos.length ? (tempos.reduce(function(a,b){ return a+b; },0)/tempos.length) : null;
+  var emAberto = dados.demandas.filter(function(d){ return ABERTOS.indexOf(d.status) !== -1; }).length;
+  var porMes = (lista.length / n);
+
+  $("#kpisAnalise").innerHTML = [
+    {rot:"Taxa de conclusão", val:taxa + "%", sub:concluidas.length + " de " + lista.length + " no período", cor:"var(--g-concluida)"},
+    {rot:"Tempo médio", val:(media === null ? "—" : media.toFixed(1)), sub:"dias até a conclusão", cor:"var(--primary)"},
+    {rot:"Média mensal", val:porMes.toFixed(1), sub:"aberturas por mês", cor:"var(--g-andamento)"},
+    {rot:"Backlog atual", val:emAberto, sub:"demandas ainda em aberto", cor:"var(--g-aberta)"}
+  ].map(function(k){
+    return '<div class="kpi" style="--cor:'+k.cor+'"><div class="rot">'+esc(k.rot)+'</div>'+
+           '<div class="val">'+esc(k.val)+'</div><div class="sub">'+esc(k.sub)+'</div></div>';
+  }).join("");
+
+  /* --- Série mensal --- */
+  var baldes = [];
+  for(var i = n-1; i >= 0; i--){
+    var m = new Date(); m.setDate(1); m.setMonth(m.getMonth()-i);
+    baldes.push({chave:m.getFullYear()+"-"+m.getMonth(), rot:MES_CURTO[m.getMonth()],
+                 ano:String(m.getFullYear()).slice(2), criadas:0, concluidas:0});
+  }
+  function balde(iso){
+    var d = new Date(iso);
+    if(isNaN(d)) return null;
+    var c = d.getFullYear()+"-"+d.getMonth();
+    for(var j=0;j<baldes.length;j++){ if(baldes[j].chave === c) return baldes[j]; }
+    return null;
+  }
+  dados.demandas.forEach(function(d){
+    var b = balde(d.criadaEm); if(b) b.criadas++;
+    if(d.concluidaEm){ var c = balde(d.concluidaEm); if(c) c.concluidas++; }
+  });
+  graficoColunas($("#grafMeses"), baldes);
+
+  /* --- Situação (rosca) --- */
+  var fatias = STATUS.map(function(s){
+    return {nome:s.nome, valor:lista.filter(function(d){ return d.status === s.id; }).length,
+            cor:COR_STATUS_GRAF[s.id]};
+  }).filter(function(f){ return f.valor > 0; });
+  graficoRosca($("#grafRosca"), $("#legRosca"), fatias);
+
+  /* --- Prioridade --- */
+  graficoBarras($("#grafPrioridade"), PRIORIDADES.slice().reverse().map(function(p){
+    return {nome:p.nome, valor:lista.filter(function(d){ return d.prioridade === p.id; }).length};
+  }), "var(--primary)", "demanda(s)");
+
+  /* --- Sistemas --- */
+  var sis = {};
+  lista.forEach(function(d){ sis[d.sistema] = (sis[d.sistema]||0) + 1; });
+  graficoBarras($("#grafSistemas"), Object.keys(sis).map(function(k){
+    return {nome:k, valor:sis[k]};
+  }).sort(function(a,b){ return b.valor - a.valor; }).slice(0,8), "var(--primary)", "demanda(s)");
+
+  /* --- Responsáveis (empilhado) --- */
+  var resp = {};
+  lista.forEach(function(d){
+    if(d.status === "cancelada") return;
+    if(!resp[d.responsavel]) resp[d.responsavel] = {nome:d.responsavel, aberto:0, concluida:0};
+    if(d.status === "concluida") resp[d.responsavel].concluida++;
+    else resp[d.responsavel].aberto++;
+  });
+  graficoEmpilhado($("#grafResponsaveis"), Object.keys(resp).map(function(k){ return resp[k]; })
+    .sort(function(a,b){ return (b.aberto+b.concluida) - (a.aberto+a.concluida); }).slice(0,8));
+}
+
+/* Caminho de barra com as duas pontas do dado arredondadas (4px), base reta. */
+function barraV(x, y, w, h, r){
+  r = Math.max(0, Math.min(r, w/2, h));
+  return 'M'+x+','+(y+h)+' V'+(y+r)+' a'+r+','+r+' 0 0 1 '+r+',-'+r+
+         ' h'+(w-2*r)+' a'+r+','+r+' 0 0 1 '+r+','+r+' V'+(y+h)+' Z';
+}
+function barraH(x, y, w, h, r){
+  r = Math.max(0, Math.min(r, h/2, w));
+  return 'M'+x+','+y+' H'+(x+w-r)+' a'+r+','+r+' 0 0 1 '+r+','+r+
+         ' v'+(h-2*r)+' a'+r+','+r+' 0 0 1 -'+r+','+r+' H'+x+' Z';
+}
+function escalaBonita(max){
+  if(max <= 4) return {topo:Math.max(1,max), passo:1};
+  var bruto = max/4, mag = Math.pow(10, Math.floor(Math.log(bruto)/Math.LN10));
+  var passo = [1,2,5,10].map(function(m){ return m*mag; })
+    .filter(function(p){ return p >= bruto; })[0] || 10*mag;
+  passo = Math.max(1, Math.round(passo));
+  return {topo:Math.ceil(max/passo)*passo, passo:passo};
+}
+function semDados(alvo, texto){
+  alvo.innerHTML = '<p class="graf-vazio">'+esc(texto)+'</p>';
+}
+
+/* Colunas agrupadas: duas séries por mês. */
+function graficoColunas(alvo, itens){
+  var total = itens.reduce(function(a,b){ return a + b.criadas + b.concluidas; }, 0);
+  if(!total) return semDados(alvo, "Nenhuma demanda registrada no período.");
+  var W = 760, H = 250, ml = 34, mr = 8, mt = 14, mb = 30;
+  var larg = W-ml-mr, alt = H-mt-mb;
+  var esc2 = escalaBonita(itens.reduce(function(m,i){ return Math.max(m, i.criadas, i.concluidas); }, 0));
+  var passo = larg / itens.length;
+  var bw = Math.min(26, Math.max(4, passo/2 - 6));
+  var s = '<svg class="svg-graf" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Aberturas e conclusões por mês">';
+  for(var v = 0; v <= esc2.topo; v += esc2.passo){
+    var y = mt + alt - (v/esc2.topo)*alt;
+    s += '<line class="grade" x1="'+ml+'" y1="'+y+'" x2="'+(W-mr)+'" y2="'+y+'"/>'+
+         '<text x="'+(ml-8)+'" y="'+(y+4)+'" text-anchor="end">'+v+'</text>';
+  }
+  itens.forEach(function(it, i){
+    var cx = ml + passo*i + passo/2;
+    [["criadas","var(--s-criadas)","Abertas"],["concluidas","var(--s-concluidas)","Concluídas"]]
+      .forEach(function(serie, k){
+        var val = it[serie[0]];
+        var h = val ? Math.max(3, (val/esc2.topo)*alt) : 0;
+        if(!h) return;
+        var x = cx - bw - 1 + k*(bw+2);
+        s += '<path class="marca" d="'+barraV(x, mt+alt-h, bw, h, 4)+'" fill="'+serie[1]+'" '+
+             'data-tip="'+esc(it.rot+"/"+it.ano+" — "+serie[2]+": "+val)+'"/>';
+      });
+    var rotEixo = (i === 0 || it.rot === "jan") ? it.rot+"/"+it.ano : it.rot;
+    s += '<text x="'+cx+'" y="'+(H-10)+'" text-anchor="middle">'+rotEixo+'</text>';
+  });
+  s += '<line class="base" x1="'+ml+'" y1="'+(mt+alt)+'" x2="'+(W-mr)+'" y2="'+(mt+alt)+'"/></svg>';
+  alvo.innerHTML = s;
+}
+
+/* Rosca com legenda rotulada (identidade nunca só pela cor). */
+function graficoRosca(alvo, alvoLeg, fatias){
+  var total = fatias.reduce(function(a,f){ return a + f.valor; }, 0);
+  if(!total){ semDados(alvo, "Sem demandas no período."); alvoLeg.innerHTML = ""; return; }
+  var R = 62, L = 20, C = 2*Math.PI*R, off = 0;
+  var s = '<svg class="svg-graf" viewBox="0 0 160 160" style="max-width:170px" role="img" aria-label="Distribuição por situação">'+
+          '<g transform="translate(80,80) rotate(-90)">';
+  fatias.forEach(function(f){
+    var comp = (f.valor/total)*C;
+    var vao = fatias.length > 1 ? 2 : 0;
+    s += '<circle class="marca" r="'+R+'" fill="none" stroke="'+f.cor+'" stroke-width="'+L+'" '+
+         'stroke-dasharray="'+Math.max(0.5, comp-vao)+' '+(C-comp+vao)+'" stroke-dashoffset="'+(-off)+'" '+
+         'data-tip="'+esc(f.nome+": "+f.valor+" ("+Math.round(f.valor/total*100)+"%)")+'"/>';
+    off += comp;
+  });
+  s += '</g><text x="80" y="76" text-anchor="middle" class="valor" style="font-size:22px">'+total+'</text>'+
+       '<text x="80" y="94" text-anchor="middle">demandas</text></svg>';
+  alvo.innerHTML = s;
+  alvoLeg.innerHTML = fatias.map(function(f){
+    return '<div class="rosca-item"><i style="background:'+f.cor+'"></i><span>'+esc(f.nome)+'</span>'+
+      '<b>'+f.valor+'</b><em>'+Math.round(f.valor/total*100)+'%</em></div>';
+  }).join("");
+}
+
+/* Barras horizontais de série única. */
+function graficoBarras(alvo, itens, cor, unidade){
+  itens = itens.filter(function(i){ return i.valor > 0; });
+  if(!itens.length) return semDados(alvo, "Sem dados no período.");
+  var rotL = 118, valL = 34, W = 520, lin = 30, H = itens.length*lin + 6;
+  var max = itens.reduce(function(m,i){ return Math.max(m,i.valor); }, 0) || 1;
+  var larg = W - rotL - valL;
+  var s = '<svg class="svg-graf" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Barras horizontais">';
+  itens.forEach(function(it, i){
+    var y = i*lin + 5, h = 14;
+    var w = Math.max(3, (it.valor/max)*larg);
+    var nome = it.nome.length > 18 ? it.nome.slice(0,17)+"…" : it.nome;
+    s += '<text x="0" y="'+(y+h-2)+'">'+esc(nome)+'</text>'+
+         '<path class="marca" d="'+barraH(rotL, y, w, h, 4)+'" fill="'+cor+'" '+
+         'data-tip="'+esc(it.nome+": "+it.valor+" "+unidade)+'"/>'+
+         '<text class="valor" x="'+(rotL+w+8)+'" y="'+(y+h-2)+'">'+it.valor+'</text>';
+  });
+  alvo.innerHTML = s + '</svg>';
+}
+
+/* Barras empilhadas: em aberto + concluídas por responsável. */
+function graficoEmpilhado(alvo, itens){
+  if(!itens.length) return semDados(alvo, "Sem dados no período.");
+  var rotL = 118, valL = 34, W = 520, lin = 30, H = itens.length*lin + 6;
+  var max = itens.reduce(function(m,i){ return Math.max(m, i.aberto+i.concluida); }, 0) || 1;
+  var larg = W - rotL - valL;
+  var s = '<svg class="svg-graf" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Carga por responsável">';
+  itens.forEach(function(it, i){
+    var y = i*lin + 5, h = 14, x = rotL;
+    var nome = it.nome.length > 18 ? it.nome.slice(0,17)+"…" : it.nome;
+    s += '<text x="0" y="'+(y+h-2)+'">'+esc(nome)+'</text>';
+    [["aberto","var(--s-criadas)","em aberto"],["concluida","var(--s-concluidas)","concluída(s)"]]
+      .forEach(function(p){
+        if(!it[p[0]]) return;
+        var w = Math.max(3, (it[p[0]]/max)*larg);
+        s += '<path class="marca" d="'+barraH(x, y, w, h, 4)+'" fill="'+p[1]+'" '+
+             'data-tip="'+esc(it.nome+": "+it[p[0]]+" "+p[2])+'"/>';
+        x += w + 2;   /* 2px de respiro entre os segmentos */
+      });
+    s += '<text class="valor" x="'+(x+6)+'" y="'+(y+h-2)+'">'+(it.aberto+it.concluida)+'</text>';
+  });
+  alvo.innerHTML = s + '</svg>';
+}
+
+/* Camada de hover compartilhada pelos gráficos. */
+function ligarDicas(){
+  var tip = document.createElement("div");
+  tip.id = "tipGraf";
+  document.body.appendChild(tip);
+  var pg = $("#pg-analise");
+  pg.addEventListener("mouseover", function(e){
+    var alvo = e.target.closest ? e.target.closest("[data-tip]") : null;
+    if(!alvo) return;
+    tip.textContent = alvo.getAttribute("data-tip");
+    tip.classList.add("on");
+  });
+  pg.addEventListener("mousemove", function(e){
+    if(!tip.classList.contains("on")) return;
+    var x = Math.min(e.clientX + 14, window.innerWidth - tip.offsetWidth - 10);
+    tip.style.left = x + "px";
+    tip.style.top = (e.clientY - tip.offsetHeight - 12) + "px";
+  });
+  pg.addEventListener("mouseout", function(e){
+    if(e.target.closest && e.target.closest("[data-tip]")) tip.classList.remove("on");
+  });
+}
+
+/* ===================== Quadro (Kanban) ===================== */
+function renderKanban(){
+  $("#kanban").innerHTML = STATUS.map(function(s){
+    var itens = dados.demandas.filter(function(d){ return d.status === s.id; })
+      .sort(function(a,b){ return prioridadeDe(b.prioridade).peso - prioridadeDe(a.prioridade).peso; });
+    var cartoes = itens.map(function(d){
+      return '<div class="mini" draggable="true" data-id="'+esc(d.id)+'">'+
+        '<div class="n">'+esc(d.numero)+'</div>'+
+        '<div class="t">'+esc(d.titulo)+'</div>'+
+        '<div class="m">'+etiquetaPrioridade(d)+'<span>'+esc(d.sistema)+'</span>'+
+        '</div></div>';
+    }).join("");
+    return '<div class="coluna" data-status="'+s.id+'">'+
+      '<h3><span style="color:'+s.cor+'">'+esc(s.nome)+'</span><b>'+itens.length+'</b></h3>'+
+      '<div class="lista">'+ (cartoes || '<p style="color:var(--muted);font-size:12.5px;margin:6px 2px">Vazio</p>') +'</div></div>';
+  }).join("");
+
+  $$("#kanban .mini").forEach(function(el){
+    el.addEventListener("click", function(){ abrirModal(el.dataset.id); });
+    el.addEventListener("dragstart", function(ev){
+      ev.dataTransfer.setData("text/plain", el.dataset.id);
+      ev.dataTransfer.effectAllowed = "move";
+    });
+  });
+  $$("#kanban .coluna").forEach(function(col){
+    col.addEventListener("dragover", function(ev){ ev.preventDefault(); col.classList.add("alvo"); });
+    col.addEventListener("dragleave", function(){ col.classList.remove("alvo"); });
+    col.addEventListener("drop", function(ev){
+      ev.preventDefault(); col.classList.remove("alvo");
+      var id = ev.dataTransfer.getData("text/plain");
+      mudarStatus(id, col.dataset.status);
+    });
+  });
+}
+function mudarStatus(id, novo){
+  var d = acharDemanda(id);
+  if(!d || d.status === novo) return;
+  var antes = statusDe(d.status).nome;
+  d.status = novo;
+  d.concluidaEm = (novo === "concluida") ? new Date().toISOString() : null;
+  registrar(d, "Situação alterada de " + antes + " para " + statusDe(novo).nome + ".");
+  salvar();
+  renderKanban(); renderTabela();
+  if($("#pg-analise").classList.contains("ativa")) renderAnalise();
+  if(idAberto === id) abrirModal(id);
+  toast(d.numero + " → " + statusDe(novo).nome);
+}
+
+/* ===================== Modal ===================== */
+function abrirModal(id){
+  var d = acharDemanda(id);
+  if(!d) return;
+  idAberto = id;
+  $("#modalNumero").textContent = d.numero;
+  $("#modalTitulo").textContent = d.titulo;
+
+  var dias = diasDesde(d.criadaEm);
+  var atraso = (ABERTOS.indexOf(d.status) !== -1 && dias !== null && dias >= 30)
+    ? '<div class="aviso"><span>⚠</span><div>Demanda em aberto há '+dias+' dias, desde '+
+      dataBR(d.criadaEm)+'.</div></div>' : "";
+
+  var ficha = [
+    ["Situação", etiquetaStatus(d)],
+    ["Prioridade", etiquetaPrioridade(d)],
+    ["Sistema relacionado", esc(d.sistema)],
+    ["Responsável", esc(d.responsavel)],
+    ["Solicitante", esc(d.solicitante)],
+    ["Abertura", dataBR(d.criadaEm)],
+    ["Tempo em aberto", (dias === null ? "—" : dias + " dia(s)")],
+    ["Conclusão", d.concluidaEm ? dataBR(d.concluidaEm) : "—"]
+  ].map(function(par){
+    return '<div><span>'+par[0]+'</span><b>'+par[1]+'</b></div>';
+  }).join("");
+
+  var hist = (d.historico||[]).slice().reverse().map(function(h){
+    return '<li><time>'+dataHoraBR(h.em)+'</time>'+esc(h.texto)+'</li>';
+  }).join("");
+
+  $("#modalCorpo").innerHTML = atraso +
+    '<div class="ficha">'+ficha+'</div>'+
+    '<h2 class="sec">Descrição</h2><div class="bloco-desc">'+esc(d.descricao)+'</div>'+
+    '<h2 class="sec">Registrar andamento</h2>'+
+    '<div class="barra-acoes" style="margin-bottom:18px">'+
+      '<input type="text" id="novoAndamento" placeholder="Descreva o andamento..." style="flex:1;min-width:200px">'+
+      '<button class="btn" id="btnAndamento">Registrar</button></div>'+
+    '<h2 class="sec">Histórico</h2><ul class="historico">'+(hist || '<li>Sem registros.</li>')+'</ul>';
+
+  $("#btnAndamento").addEventListener("click", function(){
+    var t = $("#novoAndamento").value.trim();
+    if(!t){ toast("Escreva o andamento antes de registrar.","erro"); return; }
+    registrar(d, t); salvar(); abrirModal(id); toast("Andamento registrado.");
+  });
+
+  var prox = proximoStatus(d.status);
+  var btn = $("#btnAvancar");
+  if(prox){ btn.style.display=""; btn.textContent = "Marcar como " + statusDe(prox).nome; }
+  else btn.style.display = "none";
+
+  $("#modal").classList.add("aberto");
+  document.body.style.overflow = "hidden";
+}
+function proximoStatus(atual){
+  var fluxo = {aberta:"andamento", andamento:"concluida", aguardando:"andamento"};
+  return fluxo[atual] || null;
+}
+function fecharModal(){
+  $("#modal").classList.remove("aberto");
+  document.body.style.overflow = "";
+  idAberto = null;
+}
+
+/* ===================== Formulário ===================== */
+function limparForm(){
+  $("#fId").value = "";
+  $("#cTitulo").value = ""; $("#cDescricao").value = ""; $("#cSolicitante").value = "";
+  $("#cSistema").value = ""; $("#cResponsavel").value = dados.responsaveis[0] || "";
+  $("#cPrioridade").value = "media"; $("#cStatus").value = "aberta";
+  $("#cObs").value = "";
+  $("#tituloForm").textContent = "Nova Ordem de Demanda";
+  $("#subtituloForm").textContent = "Preencha os dados para registrar a demanda.";
+  limparErros();
+}
+function limparErros(){
+  ["Titulo","Descricao","Solicitante","Sistema"].forEach(function(c){
+    var e = $("#erro"+c); if(e) e.textContent = "";
+  });
+  ["cTitulo","cDescricao","cSolicitante","cSistema"].forEach(function(id){
+    var el = $("#"+id); if(el) el.classList.remove("invalido");
+  });
+}
+function editar(id){
+  var d = acharDemanda(id);
+  if(!d) return;
+  fecharModal();
+  limparForm();
+  $("#fId").value = d.id;
+  $("#cTitulo").value = d.titulo;
+  $("#cDescricao").value = d.descricao;
+  if(dados.solicitantes.indexOf(d.solicitante) === -1) dados.solicitantes.push(d.solicitante);
+  if(dados.sistemas.indexOf(d.sistema) === -1) dados.sistemas.push(d.sistema);
+  if(dados.responsaveis.indexOf(d.responsavel) === -1) dados.responsaveis.push(d.responsavel);
+  montarSelects();
+  $("#cSolicitante").value = d.solicitante;
+  $("#cSistema").value = d.sistema;
+  $("#cResponsavel").value = d.responsavel;
+  $("#cPrioridade").value = d.prioridade;
+  $("#cStatus").value = d.status;
+  $("#cObs").value = "";
+  $("#tituloForm").textContent = "Editar " + d.numero;
+  $("#subtituloForm").textContent = "Alterações ficam registradas no histórico da demanda.";
+  irPara("nova");
+}
+function validar(){
+  limparErros();
+  var ok = true;
+  function falha(id, campo, msg){ $("#erro"+id).textContent = msg; $("#"+campo).classList.add("invalido"); ok = false; }
+  if($("#cTitulo").value.trim().length < 5) falha("Titulo","cTitulo","Informe um título com pelo menos 5 caracteres.");
+  if($("#cDescricao").value.trim().length < 10) falha("Descricao","cDescricao","Descreva a demanda com pelo menos 10 caracteres.");
+  if(!$("#cSolicitante").value) falha("Solicitante","cSolicitante","Selecione o solicitante.");
+  if(!$("#cSistema").value) falha("Sistema","cSistema","Informe se há ligação com um sistema existente.");
+  return ok;
+}
+function submeter(ev){
+  ev.preventDefault();
+  if(!validar()){ toast("Verifique os campos destacados.","erro"); return; }
+  var id = $("#fId").value;
+  var obs = $("#cObs").value.trim();
+  var novoStatus = $("#cStatus").value;
+
+  if(id){
+    var d = acharDemanda(id);
+    if(!d) return;
+    var mudancas = [];
+    if(d.titulo !== $("#cTitulo").value.trim()) mudancas.push("título");
+    if(d.descricao !== $("#cDescricao").value.trim()) mudancas.push("descrição");
+    if(d.solicitante !== $("#cSolicitante").value) mudancas.push("solicitante");
+    if(d.sistema !== $("#cSistema").value) mudancas.push("sistema relacionado");
+    if(d.responsavel !== $("#cResponsavel").value) mudancas.push("responsável");
+    if(d.prioridade !== $("#cPrioridade").value) mudancas.push("prioridade");
+    var statusMudou = d.status !== novoStatus;
+
+    d.titulo = $("#cTitulo").value.trim();
+    d.descricao = $("#cDescricao").value.trim();
+    d.solicitante = $("#cSolicitante").value;
+    d.sistema = $("#cSistema").value;
+    d.responsavel = $("#cResponsavel").value;
+    d.prioridade = $("#cPrioridade").value;
+    if(statusMudou){
+      var antes = statusDe(d.status).nome;
+      d.status = novoStatus;
+      d.concluidaEm = (novoStatus === "concluida") ? new Date().toISOString() : null;
+      registrar(d, "Situação alterada de " + antes + " para " + statusDe(novoStatus).nome + ".");
+    }
+    if(mudancas.length) registrar(d, "Demanda editada (" + mudancas.join(", ") + ").");
+    if(obs) registrar(d, obs);
+    salvar();
+    toast(d.numero + " atualizada.");
+  } else {
+    var nova = {
+      id: novoId(),
+      numero: proximoNumero(),
+      titulo: $("#cTitulo").value.trim(),
+      descricao: $("#cDescricao").value.trim(),
+      solicitante: $("#cSolicitante").value,
+      sistema: $("#cSistema").value,
+      responsavel: $("#cResponsavel").value,
+      prioridade: $("#cPrioridade").value,
+      status: novoStatus,
+      criadaEm: new Date().toISOString(),
+      concluidaEm: (novoStatus === "concluida") ? new Date().toISOString() : null,
+      historico: []
+    };
+    registrar(nova, "Demanda registrada por " + nova.solicitante + ".");
+    registrar(nova, nova.sistema === SEM_SISTEMA
+      ? "Sem ligação com sistema existente (demanda nova)."
+      : "Vinculada ao sistema: " + nova.sistema + ".");
+    if(obs) registrar(nova, obs);
+    dados.demandas.push(nova);
+    salvar();
+    toast("OD " + nova.numero + " criada.");
+  }
+  limparForm();
+  irPara("demandas");
+}
+
+/* ===================== Configurações ===================== */
+var META_LISTAS = {
+  sistemas:{
+    titulo:"Sistemas existentes",
+    desc:"Sistemas que podem ser vinculados a uma demanda no campo “Tem ligação com sistema existente?”.",
+    campo:"sistema", placeholder:"Ex.: Sistema de Protocolo"
+  },
+  solicitantes:{
+    titulo:"Solicitantes",
+    desc:"Pessoas ou áreas que podem abrir uma demanda. Aparecem na lista suspensa do formulário.",
+    campo:"solicitante", placeholder:"Ex.: Financeiro"
+  },
+  responsaveis:{
+    titulo:"Responsáveis",
+    desc:"Quem pode ser designado para atender a demanda.",
+    campo:"responsavel", placeholder:"Ex.: Luan Oliveira"
+  }
+};
+var listaAtiva = "sistemas";
+var editandoItem = -1;
+
+function renderConfig(){
+  $("#cOrg").value = dados.org;
+  $("#cPrefixo").value = dados.prefixo;
+  var ano = new Date().getFullYear();
+  var seq = String((dados.sequencias[ano] || 0) + 1);
+  while(seq.length < 4) seq = "0" + seq;
+  $("#previaNumero").textContent = dados.prefixo + "-" + ano + "-" + seq;
+  $("#previaTotal").textContent = dados.demandas.length + " demanda(s)";
+  renderLista();
+}
+function usoDe(campo, nome){
+  return dados.demandas.filter(function(d){ return d[campo] === nome; }).length;
+}
+function renderLista(){
+  var meta = META_LISTAS[listaAtiva];
+  var lista = dados[listaAtiva];
+  $("#listaTitulo").textContent = meta.titulo;
+  $("#listaDesc").textContent = meta.desc;
+  $("#novoItem").placeholder = meta.placeholder;
+  $$("#segLista button").forEach(function(b){ b.classList.toggle("ativo", b.dataset.lista === listaAtiva); });
+
+  $("#listaItens").innerHTML = lista.map(function(nome, i){
+    var fixo = (listaAtiva === "sistemas" && nome === SEM_SISTEMA);
+    if(i === editandoItem){
+      return '<div class="item-lista">'+
+        '<input type="text" id="editItem" maxlength="60" value="'+esc(nome)+'">'+
+        '<div class="acoes">'+
+          '<button class="mini-btn" data-ok="'+i+'" title="Salvar">&#10003;</button>'+
+          '<button class="mini-btn" data-cancela="1" title="Cancelar">&times;</button>'+
+        '</div></div>';
+    }
+    var uso = usoDe(meta.campo, nome);
+    return '<div class="item-lista">'+
+      '<span class="nome">'+esc(nome)+'</span>'+
+      (fixo ? '<span class="fixo">fixo</span>' : '')+
+      '<span class="uso">'+(uso ? uso + " demanda(s)" : "não utilizado")+'</span>'+
+      '<div class="acoes">'+
+        '<button class="mini-btn" data-edita="'+i+'" title="Renomear" '+(fixo?"disabled":"")+'>&#9998;</button>'+
+        '<button class="mini-btn perigo" data-remove="'+i+'" title="Excluir" '+(fixo?"disabled":"")+'>&#128465;</button>'+
+      '</div></div>';
+  }).join("") || '<div class="item-lista"><span class="uso" style="margin:0">Nenhum item cadastrado.</span></div>';
+
+  var campoEdicao = $("#editItem");
+  if(campoEdicao){
+    campoEdicao.focus(); campoEdicao.select();
+    campoEdicao.addEventListener("keydown", function(e){
+      if(e.key === "Enter"){ e.preventDefault(); renomearItem(editandoItem, campoEdicao.value); }
+      if(e.key === "Escape"){ editandoItem = -1; renderLista(); }
+    });
+  }
+  $$("#listaItens [data-edita]").forEach(function(b){
+    b.addEventListener("click", function(){ editandoItem = parseInt(b.dataset.edita,10); renderLista(); });
+  });
+  $$("#listaItens [data-ok]").forEach(function(b){
+    b.addEventListener("click", function(){ renomearItem(parseInt(b.dataset.ok,10), $("#editItem").value); });
+  });
+  $$("#listaItens [data-cancela]").forEach(function(b){
+    b.addEventListener("click", function(){ editandoItem = -1; renderLista(); });
+  });
+  $$("#listaItens [data-remove]").forEach(function(b){
+    b.addEventListener("click", function(){ removerItem(parseInt(b.dataset.remove,10)); });
+  });
+}
+function renomearItem(i, novo){
+  var lista = dados[listaAtiva], meta = META_LISTAS[listaAtiva];
+  var antigo = lista[i];
+  novo = String(novo||"").trim();
+  if(!novo){ toast("O nome não pode ficar vazio.","erro"); return; }
+  if(novo === antigo){ editandoItem = -1; renderLista(); return; }
+  if(lista.indexOf(novo) !== -1){ toast("Já existe um item com esse nome.","erro"); return; }
+  lista[i] = novo;
+  var n = 0;
+  dados.demandas.forEach(function(d){ if(d[meta.campo] === antigo){ d[meta.campo] = novo; n++; } });
+  if(filtros[meta.campo] === antigo) filtros[meta.campo] = novo;
+  editandoItem = -1;
+  salvar(); montarSelects(); renderConfig();
+  toast('Renomeado para "'+novo+'"' + (n ? " em "+n+" demanda(s)." : "."));
+}
+function removerItem(i){
+  var lista = dados[listaAtiva], meta = META_LISTAS[listaAtiva];
+  var nome = lista[i];
+  if(listaAtiva === "sistemas" && nome === SEM_SISTEMA){
+    toast("Essa opção é fixa e não pode ser removida.","erro"); return;
+  }
+  var uso = usoDe(meta.campo, nome);
+  if(uso){ toast('"'+nome+'" está em uso por '+uso+' demanda(s).','erro'); return; }
+  if(lista.length <= 1){ toast("Mantenha ao menos um item na lista.","erro"); return; }
+  lista.splice(i,1);
+  editandoItem = -1;
+  salvar(); montarSelects(); renderConfig();
+  toast('"'+nome+'" removido.');
+}
+function adicionarItem(){
+  var el = $("#novoItem");
+  var v = el.value.trim();
+  var lista = dados[listaAtiva];
+  if(!v){ toast("Digite um nome.","erro"); return; }
+  if(lista.indexOf(v) !== -1){ toast("Esse item já existe.","erro"); return; }
+  lista.push(v);
+  el.value = "";
+  editandoItem = -1;
+  salvar(); montarSelects(); renderConfig();
+  toast('"'+v+'" adicionado a '+META_LISTAS[listaAtiva].titulo.toLowerCase()+'.');
+}
+
+/* ===================== Exportação ===================== */
+function baixar(nome, conteudo, tipo){
+  var blob = new Blob([conteudo], {type: tipo});
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement("a");
+  a.href = url; a.download = nome;
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a);
+  setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+}
+function exportarCsv(){
+  var lista = ordenar(filtrar());
+  if(!lista.length){ toast("Não há demandas para exportar.","erro"); return; }
+  var cab = ["Numero","Titulo","Descricao","Solicitante","Sistema relacionado","Responsavel",
+             "Prioridade","Situacao","Abertura","Dias em aberto","Conclusao"];
+  function cel(v){ return '"' + String(v==null?"":v).replace(/"/g,'""') + '"'; }
+  var linhas = lista.map(function(d){
+    return [d.numero,d.titulo,d.descricao,d.solicitante,d.sistema,d.responsavel,
+      prioridadeDe(d.prioridade).nome, statusDe(d.status).nome,
+      dataBR(d.criadaEm), diasDesde(d.criadaEm), d.concluidaEm?dataBR(d.concluidaEm):""].map(cel).join(";");
+  });
+  baixar("ordens-de-demanda.csv", "﻿" + cab.join(";") + "\n" + linhas.join("\n"), "text/csv;charset=utf-8");
+  toast(lista.length + " demanda(s) exportada(s).");
+}
+function exportarBackup(){
+  baixar("backup-od-" + new Date().toISOString().slice(0,10) + ".json",
+    JSON.stringify(dados, null, 2), "application/json");
+  toast("Backup gerado.");
+}
+function importarBackup(arquivo){
+  var leitor = new FileReader();
+  leitor.onload = function(){
+    try{
+      var obj = JSON.parse(leitor.result);
+      if(!obj || !Array.isArray(obj.demandas)) throw new Error("formato");
+      if(!confirm("Isso substituirá todos os dados atuais. Continuar?")) return;
+      dados.org = obj.org || dados.org;
+      dados.prefixo = obj.prefixo || dados.prefixo;
+      var sis = obj.sistemas || obj.setores;
+      dados.sistemas = (Array.isArray(sis) && sis.length) ? sis : dados.sistemas;
+      dados.solicitantes = (Array.isArray(obj.solicitantes) && obj.solicitantes.length) ? obj.solicitantes : dados.solicitantes;
+      dados.responsaveis = (Array.isArray(obj.responsaveis) && obj.responsaveis.length) ? obj.responsaveis : dados.responsaveis;
+      dados.demandas = obj.demandas;
+      dados.sequencias = obj.sequencias || {};
+      migrar();
+      salvar(); aplicarIdentidade(); montarSelects(); irPara("painel");
+      toast(dados.demandas.length + " demanda(s) importada(s).");
+    }catch(e){ toast("Arquivo inválido.","erro"); }
+  };
+  leitor.readAsText(arquivo);
+}
+function carregarExemplos(){
+  if(dados.demandas.length && !confirm("Adicionar demandas de exemplo aos dados existentes?")) return;
+  var base = [
+    ["Erro ao gerar boleto no fechamento","Ao emitir boletos do dia 30 o sistema retorna erro 500 e não grava o registro.","Cliente","Sistema Financeiro","urgente","andamento"],
+    ["Lentidão no login do portal","Usuários relatam mais de 20 segundos para autenticar no horário de pico.","Suporte","Portal Web","alta","aberta"],
+    ["Push de notificações não chega no Android","Notificações funcionam no iOS, mas não são entregues em aparelhos Android 13+.","Suporte","Aplicativo Mobile","alta","aguardando"],
+    ["Nova tela de relatórios gerenciais","Criar painel com indicadores mensais consolidados por unidade.","Diretoria","Não — demanda nova","media","aberta"],
+    ["Integração com o novo gateway de pagamento","Implementar consumo da API de cobrança do parceiro homologado.","Equipe interna","API / Integração","media","andamento"],
+    ["Corrigir exportação de contatos da intranet","O CSV exportado vem com acentuação quebrada.","Equipe interna","Intranet","baixa","concluida"]
+  ];
+  base.forEach(function(b){
+    var d = {
+      id: novoId(), numero: proximoNumero(), titulo:b[0], descricao:b[1], solicitante:b[2],
+      sistema:b[3], responsavel: dados.responsaveis[0], prioridade:b[4], status:b[5],
+      criadaEm: new Date(Date.now() - Math.floor(Math.random()*20+1)*86400000).toISOString(),
+      concluidaEm: b[5]==="concluida" ? new Date().toISOString() : null, historico:[]
+    };
+    registrar(d, "Demanda registrada por " + d.solicitante + ".");
+    if(d.sistema !== SEM_SISTEMA) registrar(d, "Vinculada ao sistema: " + d.sistema + ".");
+    dados.demandas.push(d);
+  });
+  salvar(); irPara("painel");
+  toast("Demandas de exemplo carregadas.");
+}
+function apagarTudo(){
+  if(!confirm("Apagar TODAS as demandas e configurações? Essa ação não pode ser desfeita.")) return;
+  if(!confirm("Confirme novamente: todos os dados serão perdidos.")) return;
+  dados.demandas = []; dados.sequencias = {};
+  salvar(); aplicarIdentidade(); montarSelects(); irPara("painel");
+  toast("Todos os dados foram apagados.");
+}
+
+/* ===================== Identidade / tema ===================== */
+function aplicarIdentidade(){
+  $("#rotuloOrg").textContent = dados.org || "HeuCode";
+  document.title = "OD — " + (dados.org || "Ordem de Demandas");
+}
+function aplicarTema(t){
+  document.documentElement.setAttribute("data-tema", t);
+  try{ localStorage.setItem("od.tema", t); }catch(e){}
+}
+
+/* ===================== Eventos ===================== */
+function ligarEventos(){
+  $$("#abas button").forEach(function(b){
+    b.addEventListener("click", function(){ irPara(b.dataset.pagina); });
+  });
+  $$("[data-ir]").forEach(function(b){
+    b.addEventListener("click", function(){
+      if(b.dataset.ir === "nova") limparForm();
+      irPara(b.dataset.ir);
+    });
+  });
+
+  $("#btnTema").addEventListener("click", function(){
+    var atual = document.documentElement.getAttribute("data-tema");
+    aplicarTema(atual === "escuro" ? "claro" : "escuro");
+  });
+
+  var t;
+  $("#fBusca").addEventListener("input", function(e){
+    clearTimeout(t);
+    t = setTimeout(function(){ filtros.busca = e.target.value; pagina = 1; renderTabela(); }, 200);
+  });
+  ["fStatus","fPrioridade","fSistema","fResponsavel"].forEach(function(id){
+    $("#"+id).addEventListener("change", function(e){
+      filtros[id.slice(1,2).toLowerCase() + id.slice(2)] = e.target.value;
+      pagina = 1; renderTabela();
+    });
+  });
+  $("#btnLimpar").addEventListener("click", function(){
+    filtros = {busca:"",status:"",prioridade:"",sistema:"",responsavel:""};
+    $("#fBusca").value = "";
+    montarSelects();
+    pagina = 1; renderTabela();
+  });
+  $$("#tabela th").forEach(function(th){
+    th.addEventListener("click", function(){
+      var c = th.dataset.ord;
+      if(ordem.campo === c) ordem.desc = !ordem.desc;
+      else { ordem.campo = c; ordem.desc = false; }
+      renderTabela();
+    });
+  });
+
+  $("#formOD").addEventListener("submit", submeter);
+  $("#btnCancelarForm").addEventListener("click", function(){ limparForm(); irPara("demandas"); });
+
+  $("#btnFecharModal").addEventListener("click", fecharModal);
+  $("#modal").addEventListener("click", function(e){ if(e.target === $("#modal")) fecharModal(); });
+  document.addEventListener("keydown", function(e){ if(e.key === "Escape") fecharModal(); });
+  $("#btnEditar").addEventListener("click", function(){ if(idAberto) editar(idAberto); });
+  $("#btnImprimir").addEventListener("click", function(){ window.print(); });
+  $("#btnAvancar").addEventListener("click", function(){
+    if(!idAberto) return;
+    var d = acharDemanda(idAberto);
+    var p = d && proximoStatus(d.status);
+    if(p) mudarStatus(idAberto, p);
+  });
+  $("#btnExcluir").addEventListener("click", function(){
+    if(!idAberto) return;
+    var d = acharDemanda(idAberto);
+    if(!d) return;
+    if(!confirm("Excluir definitivamente a " + d.numero + "?")) return;
+    dados.demandas = dados.demandas.filter(function(x){ return x.id !== idAberto; });
+    salvar(); fecharModal(); renderTabela(); renderPainel();
+    toast(d.numero + " excluída.");
+  });
+
+  $("#btnCsv").addEventListener("click", exportarCsv);
+  $("#btnExportar").addEventListener("click", exportarBackup);
+  $("#btnImportar").addEventListener("click", function(){ $("#arquivoImport").click(); });
+  $("#arquivoImport").addEventListener("change", function(e){
+    if(e.target.files[0]) importarBackup(e.target.files[0]);
+    e.target.value = "";
+  });
+  $("#btnExemplo").addEventListener("click", carregarExemplos);
+  $("#btnApagar").addEventListener("click", apagarTudo);
+
+  $$("#menuConfig button").forEach(function(b){
+    b.addEventListener("click", function(){
+      $$("#menuConfig button").forEach(function(o){ o.classList.toggle("ativo", o === b); });
+      $$(".config-sec").forEach(function(s){ s.classList.toggle("ativa", s.id === "sec-"+b.dataset.sec); });
+    });
+  });
+  $$("#segLista button").forEach(function(b){
+    b.addEventListener("click", function(){
+      listaAtiva = b.dataset.lista; editandoItem = -1; renderLista();
+    });
+  });
+  $("#fPeriodo").addEventListener("change", renderAnalise);
+  $("#btnAddItem").addEventListener("click", adicionarItem);
+  $("#novoItem").addEventListener("keydown", function(e){
+    if(e.key === "Enter"){ e.preventDefault(); adicionarItem(); }
+  });
+  $("#cOrg").addEventListener("change", function(e){ dados.org = e.target.value.trim() || "HeuCode"; salvar(); aplicarIdentidade(); });
+  $("#cPrefixo").addEventListener("change", function(e){
+    var v = e.target.value.trim().toUpperCase().replace(/[^A-Z0-9]/g,"") || "OD";
+    dados.prefixo = v; e.target.value = v; salvar(); renderConfig(); toast("Prefixo definido como " + v + ".");
+  });
+}
+
+/* ===================== Início ===================== */
+function iniciar(){
+  carregar();
+  try{
+    var tema = localStorage.getItem("od.tema");
+    if(tema) document.documentElement.setAttribute("data-tema", tema);
+  }catch(e){}
+  aplicarIdentidade();
+  montarSelects();
+  limparForm();
+  ligarEventos();
+  ligarDicas();
+  renderPainel();
+}
+iniciar();
+
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-tema="escuro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title><%= titulo %></title>
+<link rel="stylesheet" href="/css/od.css?v=<%= versao %>">
+</head>
+<body class="tela-entrada">
+
+<main class="entrada">
+  <div class="entrada-caixa">
+    <div class="entrada-marca">
+      <div class="mark">&lt;/&gt;</div>
+      <strong><span class="texto-grad">OD</span> · Ordem de Demandas</strong>
+      <small><%= portal ? portal.nome : 'HeuCode' %></small>
+    </div>
+
+    <% if (portal) { %>
+      <p class="entrada-nota">Portal exclusivo de <b><%= portal.nome %></b>.
+        Use a conta fornecida pela empresa.</p>
+    <% } %>
+
+    <% if (erro) { %>
+      <div class="entrada-erro"><span>⚠</span><%= erro %></div>
+    <% } %>
+
+    <form method="post" action="<%= portal ? '/p/' + portal.slug + '/entrar' : '/entrar' %>">
+      <input type="hidden" name="destino" value="<%= destino %>">
+      <div class="campo">
+        <label for="email">E-mail</label>
+        <input type="email" id="email" name="email" autocomplete="username"
+               placeholder="voce@dominio.com" autofocus required>
+      </div>
+      <div class="campo">
+        <label for="senha">Senha</label>
+        <input type="password" id="senha" name="senha" autocomplete="current-password"
+               placeholder="••••••••" required>
+      </div>
+      <button type="submit" class="btn btn-primario entrada-botao">Entrar</button>
+    </form>
+
+    <p class="entrada-rodape">
+      <% if (portal) { %>
+        Esqueceu a senha? Fale com o gestor da sua empresa.
+      <% } else { %>
+        Acesso restrito à administração do sistema.
+      <% } %>
+    </p>
+  </div>
+
+  <p class="entrada-assinatura">HeuCode · Ordem de Demandas</p>
+</main>
+
+</body>
+</html>

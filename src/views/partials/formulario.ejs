@@ -1,0 +1,61 @@
+<section class="pagina" id="pg-nova">
+    <div class="cabecalho-pagina">
+      <div><h1 id="tituloForm">Nova Ordem de Demanda</h1>
+        <p id="subtituloForm">Preencha os dados para registrar a demanda.</p></div>
+    </div>
+    <form class="cartao cartao-pad" id="formOD" novalidate style="max-width:900px">
+      <input type="hidden" id="fId">
+      <div class="campo">
+        <label for="cTitulo">Título da demanda *</label>
+        <input type="text" id="cTitulo" maxlength="120" placeholder="Ex.: Erro ao gerar boleto no fechamento mensal">
+        <div class="msg-erro" id="erroTitulo"></div>
+      </div>
+      <div class="campo">
+        <label for="cDescricao">Descrição / objeto *</label>
+        <textarea id="cDescricao" placeholder="Descreva o problema ou a solicitação, o impacto e como reproduzir, se for o caso."></textarea>
+        <div class="msg-erro" id="erroDescricao"></div>
+      </div>
+      <div class="linha">
+        <div class="campo"><label for="cSolicitante">Solicitante *</label>
+          <select id="cSolicitante"></select>
+          <div class="msg-erro" id="erroSolicitante"></div></div>
+        <div class="campo"><label for="cSistema">Sistema *</label>
+          <select id="cSistema"></select>
+          <div class="dica">Sistemas cadastrados na empresa (Configurações → Empresas e sistemas).</div>
+          <div class="msg-erro" id="erroSistema"></div></div>
+      </div>
+      <div class="linha">
+        <div class="campo"><label for="cTipoAcao">Tipo de ação</label>
+          <select id="cTipoAcao"></select>
+          <div class="dica" id="dicaTipoAcao"></div></div>
+        <div class="campo"><label for="cPrioridade">Prioridade</label><select id="cPrioridade"></select></div>
+      </div>
+      <div class="linha">
+        <div class="campo"><label for="cResponsavel">Responsável</label><select id="cResponsavel"></select></div>
+        <div class="campo"><label for="cProjeto">Projeto</label>
+          <select id="cProjeto"></select>
+          <div class="dica">Opcional — liga a OD a um projeto em andamento.</div></div>
+      </div>
+      <div class="campo" style="max-width:calc(50% - 7px)">
+        <label for="cStatus">Situação</label><select id="cStatus"></select>
+      </div>
+      <div class="campo">
+        <label>Imagens da demanda</label>
+        <label class="area-solta" id="areaSolta" for="cImagens">
+          <span class="icone">🖼️</span>
+          <b>Clique para escolher ou arraste as imagens aqui</b>
+          <span class="dica">PNG, JPEG, WEBP ou GIF · até 8 imagens · imagens grandes são
+            reduzidas automaticamente antes de salvar</span>
+        </label>
+        <input type="file" id="cImagens" accept="image/png,image/jpeg,image/webp,image/gif" multiple hidden>
+        <div class="galeria" id="previasForm"></div>
+        <div class="dica" id="contadorAnexos"></div>
+      </div>
+      <div class="campo"><label for="cObs">Observação inicial</label>
+        <input type="text" id="cObs" maxlength="160" placeholder="Opcional — registrada no histórico"></div>
+      <div class="barra-acoes" style="margin-top:6px">
+        <button type="submit" class="btn btn-primario">Salvar OD</button>
+        <button type="button" class="btn" id="btnCancelarForm">Cancelar</button>
+      </div>
+    </form>
+  </section>

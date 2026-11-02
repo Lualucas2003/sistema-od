@@ -1,0 +1,62 @@
+{
+  "_comentario": "JSON só para testes. 'projeto' é o corpo de POST /api/projetos (ids vêm das listas: sistemas, solicitantes, responsaveis); 'atividades' são enviadas depois de criado o projeto (POST /api/projetos/:id/etapas). 'demandas' são OD de teste já criadas e vinculadas ao projeto (título com [TESTE]).",
+  "projeto": {
+    "nome": "[TESTE] Painel de indicadores",
+    "objetivo": "Projeto de teste para validar a criação de atividades no perfil do projeto.",
+    "sistemaId": 54,
+    "solicitanteId": 3,
+    "responsavelId": 1,
+    "prioridade": "media",
+    "situacao": "planejamento",
+    "inicioPrevisto": "2026-10-20",
+    "fimPrevisto": "2026-11-30",
+    "etapas": [
+      {
+        "titulo": "Levantar indicadores com a diretoria"
+      },
+      {
+        "titulo": "Desenvolver tela de indicadores"
+      },
+      {
+        "titulo": "Testar com dados reais"
+      }
+    ]
+  },
+  "atividades": [
+    {
+      "titulo": "Reunião de alinhamento com o cliente",
+      "descricao": "Validar prioridades antes de começar.",
+      "prazo": "2026-10-25"
+    },
+    {
+      "titulo": "Validar nomes dos indicadores",
+      "descricao": "Conferir com o financeiro.",
+      "prazo": "2026-11-20"
+    },
+    {
+      "titulo": "Apresentação da versão de teste",
+      "descricao": null,
+      "prazo": null
+    }
+  ],
+  "demandas": [
+    {
+      "numero": "OD-2026-0074",
+      "titulo": "[TESTE] Indicador de faturamento sem dados",
+      "prioridade": "alta",
+      "situacao": "aberta"
+    },
+    {
+      "numero": "OD-2026-0075",
+      "titulo": "[TESTE] Exportar indicadores em planilha",
+      "prioridade": "media",
+      "situacao": "aberta"
+    },
+    {
+      "numero": "OD-2026-0076",
+      "titulo": "[TESTE] Filtro por unidade no painel",
+      "prioridade": "baixa",
+      "situacao": "aberta"
+    }
+  ]
+}

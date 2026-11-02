@@ -1,0 +1,123 @@
+<!-- ----------------------------- Lista de projetos ----------------------------- -->
+<section class="pagina" id="pg-projetos">
+    <div class="cabecalho-pagina">
+      <div><h1>Projetos</h1>
+        <p>Cada projeto reúne o objetivo, o documento de requisitos e as atividades
+           que serão executados para ele acontecer.</p></div>
+      <% if (pode['projeto.criar']) { %>
+      <div class="barra-acoes">
+        <button class="btn btn-primario" data-ir="projeto-novo">+ Novo projeto</button>
+      </div>
+      <% } %>
+    </div>
+
+    <div class="filtros filtros-projeto">
+      <div class="campo"><label for="pBusca">Buscar</label>
+        <input type="search" id="pBusca" placeholder="Código, nome, objetivo..."></div>
+      <div class="campo"><label for="pSituacao">Situação</label><select id="pSituacao"></select></div>
+      <div class="campo"><label for="pPrioridade">Prioridade</label><select id="pPrioridade"></select></div>
+      <div class="campo"><label for="pSistema">Sistema</label><select id="pSistema"></select></div>
+      <div class="campo"><label for="pResponsavel">Responsável</label><select id="pResponsavel"></select></div>
+      <button class="btn" id="btnLimparProjetos">Limpar</button>
+    </div>
+
+    <div id="listaProjetos"></div>
+  </section>
+
+<!-- --------------------------- Cadastro de projeto --------------------------- -->
+<% if (pode['projeto.criar']) { %>
+<section class="pagina" id="pg-projeto-novo">
+    <div class="cabecalho-pagina">
+      <div><h1 id="tituloProjeto">Novo projeto</h1>
+        <p id="subtituloProjeto">O código sai automático (PRJ-AAAA-NNNN) ao salvar.</p></div>
+    </div>
+
+    <form class="cartao cartao-pad" id="formProjeto" novalidate style="max-width:940px">
+      <input type="hidden" id="pjId">
+
+      <h2 class="sec">Documento de requisitos</h2>
+      <div class="campo">
+        <label class="area-solta" id="areaRequisitos" for="pjArquivos">
+          <span class="icone">📄</span>
+          <b>Clique para escolher ou arraste o documento aqui</b>
+          <span class="dica">O documento preenche sozinho o nome, o objetivo e a lista de requisitos do projeto.</span>
+          <span class="dica">PDF, DOC/DOCX, ODT, RTF, TXT, MD, CSV, planilhas,
+            apresentações, imagens ou ZIP · até 6 MB por arquivo</span>
+        </label>
+        <input type="file" id="pjArquivos" multiple hidden>
+        <div class="lista-itens" id="pjDocumentos" hidden></div>
+        <div class="dica" id="pjContadorDocs"></div>
+      </div>
+
+
+      <div class="campo" id="pjCampoEmpresa" hidden>
+        <label for="pjEmpresa">Empresa</label>
+        <select id="pjEmpresa"></select>
+        <div class="dica">Só o administrador escolhe a empresa. Depois de salvo, ela não muda.</div>
+      </div>
+
+      <div class="campo">
+        <label for="pjNome">Nome do projeto *</label>
+        <input type="text" id="pjNome" maxlength="120"
+               placeholder="Ex.: Portal de autoatendimento do cliente">
+        <div class="msg-erro" id="erroPjNome"></div>
+      </div>
+
+      <div class="campo">
+        <label for="pjObjetivo">Objetivo / escopo</label>
+        <textarea id="pjObjetivo" placeholder="O que o projeto precisa entregar, para quem e por quê."></textarea>
+      </div>
+
+      <div class="linha">
+        <div class="campo"><label for="pjSistema">Sistema</label>
+          <select id="pjSistema"></select>
+          <div class="dica">Deixe em branco se o projeto envolve mais de um sistema.</div></div>
+        <div class="campo"><label for="pjSolicitante">Solicitante</label>
+          <select id="pjSolicitante"></select></div>
+      </div>
+
+      <div class="linha">
+        <div class="campo"><label for="pjResponsavel">Responsável</label>
+          <select id="pjResponsavel"></select></div>
+        <div class="campo"><label for="pjPrioridade">Prioridade</label>
+          <select id="pjPrioridade"></select></div>
+      </div>
+
+      <div class="linha">
+        <div class="campo"><label for="pjSituacao">Situação</label>
+          <select id="pjSituacao"></select></div>
+        <div class="campo"><label for="pjInicio">Início previsto</label>
+          <input type="date" id="pjInicio"></div>
+        <div class="campo"><label for="pjFim">Término previsto</label>
+          <input type="date" id="pjFim">
+          <div class="msg-erro" id="erroPjFim"></div></div>
+      </div>
+
+      <div class="campo" id="pjRequisitosCampo" hidden>
+        <h2 class="sec" style="margin-top:6px">Requisitos do documento</h2>
+        <div id="pjRequisitos"></div>
+        <div class="dica">O que foi combinado no documento. Abra a lista e clique em um
+          requisito para ler a descrição; o × tira o requisito do projeto.</div>
+      </div>
+
+      <h2 class="sec" style="margin-top:6px">Atividades</h2>
+      <div class="campo">
+        <div id="pjEtapas" class="campos-repetidos"></div>
+        <button type="button" class="btn btn-sm" id="btnAddLinhaEtapa">+ Adicionar atividade</button>
+        <div class="dica">As tarefas para o projeto acontecer (levantamento, desenvolvimento,
+          testes, entrega...), na ordem de execução. Dá para acrescentar, reordenar e concluir
+          cada atividade depois, no perfil do projeto.</div>
+      </div>
+
+      <div class="barra-acoes" style="margin-top:6px">
+        <button type="submit" class="btn btn-primario">Salvar projeto</button>
+        <button type="button" class="btn" id="btnCancelarProjeto">Cancelar</button>
+      </div>
+    </form>
+  </section>
+<% } %>
+
+<!-- ---------------------------- Perfil do projeto ---------------------------- -->
+<section class="pagina" id="pg-projeto">
+    <div id="perfilProjeto"></div>
+  </section>

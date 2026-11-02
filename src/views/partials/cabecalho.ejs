@@ -1,0 +1,46 @@
+<header class="topo">
+  <div class="topo-in">
+    <div class="logo">
+      <div class="mark">&lt;/&gt;</div>
+      <div>
+        <strong><span class="texto-grad">OD</span> · Ordem de Demandas</strong>
+        <small id="rotuloOrg"><%= config.org %></small>
+      </div>
+    </div>
+
+    <% if (portal) { %>
+      <span class="selo-portal" title="Você está no portal de <%= portal.nome %>">
+        Portal · <%= portal.nome %>
+      </span>
+    <% } %>
+
+    <nav class="abas" id="abas">
+      <button data-pagina="painel" aria-current="page">Painel</button>
+      <% if (pode['demanda.ver']) { %><button data-pagina="demandas">Demandas</button><% } %>
+      <% if (pode['demanda.criar']) { %><button data-pagina="nova">Nova OD</button><% } %>
+      <% if (pode['projeto.ver']) { %><button data-pagina="projetos">Projetos</button><% } %>
+      <% if (pode['analise.ver']) { %><button data-pagina="analise">Análise</button><% } %>
+      <% if (pode.administrar) { %><button data-pagina="config">Configurações</button><% } %>
+    </nav>
+
+    <div class="conta">
+      <button class="icone-btn" id="btnTema" title="Alternar tema">◐</button>
+      <details class="menu-conta">
+        <summary title="<%= usuario.email %>">
+          <span class="avatar"><%= usuario.nome.trim().charAt(0).toUpperCase() %></span>
+        </summary>
+        <div class="menu-caixa">
+          <b><%= usuario.nome %></b>
+          <span><%= usuario.email %></span>
+          <span class="tag pr-media" style="margin-top:6px"><%= usuario.perfil %></span>
+          <% if (usuario.empresa) { %><span><%= usuario.empresa %></span><% } %>
+          <hr>
+          <button type="button" class="btn btn-sm" id="btnTrocarSenha">Trocar senha</button>
+          <form method="post" action="<%= base %>/sair">
+            <button type="submit" class="btn btn-sm btn-perigo" style="width:100%;justify-content:center">Sair</button>
+          </form>
+        </div>
+      </details>
+    </div>
+  </div>
+</header>

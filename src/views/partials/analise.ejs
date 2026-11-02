@@ -1,0 +1,116 @@
+<section class="pagina" id="pg-analise">
+    <div class="cabecalho-pagina">
+      <div><h1>Análise</h1><p>Indicadores, evolução e distribuição das ordens de demanda.</p></div>
+    </div>
+
+    <!-- Os filtros valem para todos os indicadores e gráficos abaixo -->
+    <div class="filtros filtros-analise">
+      <div class="campo"><label for="fPeriodo">Período</label>
+        <select id="fPeriodo">
+          <option value="6">Últimos 6 meses</option>
+          <option value="12">Últimos 12 meses</option>
+          <option value="0">Todo o período</option>
+        </select></div>
+      <div class="campo"><label for="aSistema">Sistema</label><select id="aSistema"></select></div>
+      <div class="campo"><label for="aSituacao">Situação</label><select id="aSituacao"></select></div>
+      <div class="campo"><label for="aPrioridade">Prioridade</label><select id="aPrioridade"></select></div>
+      <div class="campo"><label for="aResponsavel">Responsável</label><select id="aResponsavel"></select></div>
+      <div class="campo"><label for="aTipo">Tipo de ação</label><select id="aTipo"></select></div>
+      <button class="btn" id="btnLimparAnalise">Limpar</button>
+    </div>
+    <p class="dica" id="resumoFiltro" style="margin:-4px 0 14px"></p>
+
+    <div class="grade-kpi" id="kpisAnalise"></div>
+
+    <div class="cartao cartao-pad" style="margin-bottom:16px">
+      <div class="graf-topo">
+        <div><h2>Aberturas e conclusões por mês</h2>
+          <p>Quantas OD entraram e quantas foram finalizadas em cada mês.</p></div>
+        <div class="legenda">
+          <span><i style="background:var(--s-criadas)"></i>Abertas</span>
+          <span><i style="background:var(--s-concluidas)"></i>Concluídas</span>
+        </div>
+      </div>
+      <div id="grafMeses"></div>
+    </div>
+
+    <div class="grade-2" style="margin-bottom:16px">
+      <div class="cartao cartao-pad">
+        <div class="graf-topo"><div><h2>Distribuição por situação</h2>
+          <p>Onde estão as demandas do período.</p></div></div>
+        <div class="rosca-bloco">
+          <div id="grafRosca"></div>
+          <div class="rosca-legenda" id="legRosca"></div>
+        </div>
+      </div>
+      <div class="cartao cartao-pad">
+        <div class="graf-topo"><div><h2>Por tipo de ação</h2>
+          <p>Que tipo de problema mais aparece.</p></div></div>
+        <div id="grafTipo"></div>
+      </div>
+      <div class="cartao cartao-pad">
+        <div class="graf-topo"><div><h2>Por prioridade</h2>
+          <p>Volume registrado em cada nível.</p></div></div>
+        <div id="grafPrioridade"></div>
+      </div>
+    </div>
+
+    <div class="grade-2" style="margin-bottom:22px">
+      <div class="cartao cartao-pad">
+        <div class="graf-topo"><div><h2>Sistemas mais demandados</h2>
+          <p>Top 8 vínculos informados no cadastro.</p></div></div>
+        <div id="grafSistemas"></div>
+      </div>
+      <div class="cartao cartao-pad">
+        <div class="graf-topo">
+          <div><h2>Carga por responsável</h2><p>Em aberto e já concluídas.</p></div>
+          <div class="legenda">
+            <span><i style="background:var(--s-criadas)"></i>Em aberto</span>
+            <span><i style="background:var(--s-concluidas)"></i>Concluídas</span>
+          </div>
+        </div>
+        <div id="grafResponsaveis"></div>
+      </div>
+    </div>
+
+    <!-- ----------------------------- Projetos ----------------------------- -->
+    <div class="cabecalho-pagina" style="margin-bottom:12px">
+      <div><h2 style="font-size:17px">Projetos</h2>
+        <p style="color:var(--muted);margin:2px 0 0">Como andam os projetos do recorte.
+          Aqui valem o <b>período</b>, o <b>sistema</b> e o <b>responsável</b> — situação,
+          prioridade e tipo de ação são filtros da demanda.</p></div>
+      <div class="barra-acoes"><button class="btn btn-sm" data-ir="projetos">Ver todos</button></div>
+    </div>
+
+    <div class="grade-kpi" id="kpisProjetos"></div>
+
+    <div class="grade-2" style="margin-bottom:16px">
+      <div class="cartao cartao-pad">
+        <div class="graf-topo"><div><h2>Situação dos projetos</h2>
+          <p>Em que fase está cada um.</p></div></div>
+        <div class="rosca-bloco">
+          <div id="grafRoscaProjetos"></div>
+          <div class="rosca-legenda" id="legRoscaProjetos"></div>
+        </div>
+      </div>
+      <div class="cartao cartao-pad">
+        <div class="graf-topo"><div><h2>Atividades</h2>
+          <p>Todas as atividades dos projetos do recorte, por situação.</p></div></div>
+        <div id="grafPassos"></div>
+      </div>
+    </div>
+
+    <div class="cartao cartao-pad" style="margin-bottom:22px">
+      <div class="graf-topo">
+        <div><h2>Andamento de cada projeto</h2>
+          <p>Ordenados por fase e atraso. Clique para abrir o perfil.</p></div>
+      </div>
+      <div id="andamentoProjetos"></div>
+    </div>
+
+    <div class="cabecalho-pagina" style="margin-bottom:12px">
+      <div><h2 style="font-size:17px">Quadro de situação</h2>
+        <p style="color:var(--muted);margin:2px 0 0">Arraste os cartões para mudar a situação da demanda.</p></div>
+    </div>
+    <div class="kanban" id="kanban"></div>
+  </section>
