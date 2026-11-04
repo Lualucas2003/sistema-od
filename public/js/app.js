@@ -174,8 +174,7 @@ function ligarEventos() {
     area.classList.remove('sobre');
   }));
   area.addEventListener('drop', (e) => {
-    const arquivos = Array.from(e.dataTransfer.files || [])
-      .filter((f) => f.type.startsWith('image/'));
+    const arquivos = Array.from(e.dataTransfer.files || []);
     if (arquivos.length) adicionarNaFila(arquivos);
   });
 

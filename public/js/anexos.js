@@ -9,6 +9,38 @@ import { $, esc, toast, tentar } from './ui.js';
 import { confirmar } from './dialogo.js';
 
 export const TIPOS_ACEITOS = ['image/png', 'image/jpeg', 'image/webp', 'image/gif'];
+const TIPO_PDF = 'application/pdf';
+const TIPO_DOCX = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+const LIMITE_DOCUMENTO = 6 * 1024 * 1024;
+/** Aceita para o seletor de arquivos e o arrastar-e-soltar. */
+export const ACCEPT_ANEXOS = 'image/png,image/jpeg,image/webp,image/gif,.pdf,.docx';
+const EXTENSOES = { pdf: TIPO_PDF, docx: TIPO_DOCX };
+
+/** O tipo pelo MIME ou, se o navegador não souber, pela extensão. */
+function tipoDoArquivo(arquivo) {
+  if (TIPOS_ACEITOS.includes(arquivo.type) || arquivo.type === TIPO_PDF || arquivo.type === TIPO_DOCX) {
+    return arquivo.type;
+  }
+  return EXTENSOES[(arquivo.name.split('.').pop() || '').toLowerCase()] || null;
+}
+export const ehDocumento = (tipo) => tipo === TIPO_PDF || tipo === TIPO_DOCX;
+export const rotuloDocumento = (tipo) => (tipo === TIPO_PDF ? 'PDF' : 'DOCX');
+
+/** Imagem é reduzida no navegador; PDF e DOCX seguem como estão, até 6 MB. */
+export async function prepararArquivo(arquivo) {
+  const tipo = tipoDoArquivo(arquivo);
+  if (!tipo) throw new Error(`"${arquivo.name}": use PNG, JPEG, WEBP, GIF, PDF ou DOCX.`);
+  if (!ehDocumento(tipo)) return prepararImagem(arquivo);
+  if (arquivo.size > LIMITE_DOCUMENTO) {
+    throw new Error(`"${arquivo.name}" passa de 6 MB.`);
+  }
+  const dataUrl = await lerComoDataURL(arquivo);
+  return {
+    nome: arquivo.name.slice(0, 120),
+    tipo, dados: dataUrl.split(',')[1], tamanho: arquivo.size,
+    largura: null, altura: null, previa: null
+  };
+}
 const LADO_MAXIMO = 1600;          // px — acima disso a imagem é redimensionada
 const ALVO_BYTES = 700 * 1024;     // acima disso tentamos recomprimir
 const LIMITE_BYTES = 3 * 1024 * 1024;
@@ -105,8 +137,10 @@ export function renderFila() {
   const alvo = $('#previasForm');
   if (!alvo) return;
   alvo.innerHTML = filaForm.map((img, i) => `
-    <figure class="miniatura">
-      <img src="${img.previa}" alt="${esc(img.nome)}">
+    <figure class="miniatura${ehDocumento(img.tipo) ? ' documento' : ''}">
+      ${ehDocumento(img.tipo)
+        ? `<span class="doc-abrir"><span>${rotuloDocumento(img.tipo)}</span></span>`
+        : `<img src="${img.previa}" alt="${esc(img.nome)}">`}
       <button type="button" class="remover" data-i="${i}" title="Remover">&times;</button>
       <figcaption>${esc(img.nome)}<span>${img.largura}×${img.altura} · ${tamanhoLegivel(img.tamanho)}</span></figcaption>
     </figure>`).join('');
@@ -117,18 +151,18 @@ export function renderFila() {
   const contador = $('#contadorAnexos');
   if (contador) {
     contador.textContent = filaForm.length
-      ? `${filaForm.length} de ${LIMITE_POR_DEMANDA} imagem(ns) selecionada(s)` : '';
+      ? `${filaForm.length} de ${LIMITE_POR_DEMANDA} anexo(s) selecionado(s)` : '';
   }
 }
 
 export async function adicionarNaFila(arquivos) {
   for (const arquivo of arquivos) {
     if (filaForm.length >= LIMITE_POR_DEMANDA) {
-      toast(`Limite de ${LIMITE_POR_DEMANDA} imagens por demanda.`, 'erro');
+      toast(`Limite de ${LIMITE_POR_DEMANDA} anexos por demanda.`, 'erro');
       break;
     }
     try {
-      filaForm.push(await prepararImagem(arquivo));
+      filaForm.push(await prepararArquivo(arquivo));
     } catch (erro) {
       toast(erro.message, 'erro');
     }
@@ -139,20 +173,27 @@ export async function adicionarNaFila(arquivos) {
 /* ------------------------- Galeria do detalhe (modal) ------------------------- */
 
 export function htmlGaleria(demanda) {
-  const imagens = demanda.imagens || [];
-  const cartoes = imagens.map((img) => `
-    <figure class="miniatura" data-ver="${img.id}" data-nome="${esc(img.nome)}">
-      <img src="${urlApi(`/anexos/${img.id}/arquivo`)}" alt="${esc(img.nome)}" loading="lazy">
-      <button type="button" class="remover" data-remove-anexo="${img.id}" title="Remover">&times;</button>
-      <figcaption>${esc(img.nome)}<span>${tamanhoLegivel(img.tamanho)}</span></figcaption>
-    </figure>`).join('');
+  const anexos = demanda.imagens || [];
+  const cartoes = anexos.map((img) => (ehDocumento(img.tipo)
+    ? `<figure class="miniatura documento" data-nome="${esc(img.nome)}">
+        <a class="doc-abrir" href="${urlApi(`/anexos/${img.id}/arquivo`)}" target="_blank" rel="noopener"
+           title="Abrir ${esc(img.nome)}"><span>${rotuloDocumento(img.tipo)}</span></a>
+        <button type="button" class="remover" data-remove-anexo="${img.id}" title="Remover">&times;</button>
+        <figcaption>${esc(img.nome)}<span>${tamanhoLegivel(img.tamanho)} ·
+          <a href="${urlApi(`/anexos/${img.id}/arquivo?download=1`)}" download>baixar</a></span></figcaption>
+      </figure>`
+    : `<figure class="miniatura" data-ver="${img.id}" data-nome="${esc(img.nome)}">
+        <img src="${urlApi(`/anexos/${img.id}/arquivo`)}" alt="${esc(img.nome)}" loading="lazy">
+        <button type="button" class="remover" data-remove-anexo="${img.id}" title="Remover">&times;</button>
+        <figcaption>${esc(img.nome)}<span>${tamanhoLegivel(img.tamanho)}</span></figcaption>
+      </figure>`)).join('');
 
-  return `<h2 class="sec">Imagens ${imagens.length ? `(${imagens.length})` : ''}</h2>
+  return `<h2 class="sec">Anexos ${anexos.length ? `(${anexos.length})` : ''}</h2>
     <div class="galeria">${cartoes
-      || '<p class="dica" style="margin:0">Nenhuma imagem anexada.</p>'}</div>
+      || '<p class="dica" style="margin:0">Nenhum anexo.</p>'}</div>
     <div class="barra-acoes" style="margin:12px 0 18px">
-      <label class="btn btn-sm" for="anexoModal">+ Anexar imagem</label>
-      <input type="file" id="anexoModal" accept="image/png,image/jpeg,image/webp,image/gif" multiple hidden>
+      <label class="btn btn-sm" for="anexoModal">+ Anexar arquivo</label>
+      <input type="file" id="anexoModal" accept="${ACCEPT_ANEXOS}" multiple hidden>
       <span class="dica" id="statusAnexo"></span>
     </div>`;
 }
@@ -168,7 +209,7 @@ export function ligarGaleria(demandaId, recarregar) {
       $('#statusAnexo').textContent = 'Enviando...';
       const preparadas = [];
       for (const arquivo of arquivos) {
-        try { preparadas.push(await prepararImagem(arquivo)); }
+        try { preparadas.push(await prepararArquivo(arquivo)); }
         catch (erro) { toast(erro.message, 'erro'); }
       }
       const n = await enviarImagens(demandaId, preparadas);

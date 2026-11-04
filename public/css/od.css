@@ -579,6 +579,8 @@
   .lt-legenda .lt-bola{width:12px;height:12px;border-width:2px;box-shadow:0 0 0 1px var(--c)}
   .lt-item b{font-size:12.5px;font-weight:600;line-height:1.3;word-break:break-word}
   .lt-item time{font-size:11.5px;color:var(--muted)}
+  .lt-proxima b{color:var(--text)}
+  .lt-item:not(.lt-proxima).lt-concluida b{color:var(--muted)}
   .lt-item time.atrasada{color:var(--danger);font-weight:600}
   .lt-pendente{--c:var(--muted)}
   .lt-andamento{--c:var(--roxo)}
@@ -907,3 +909,11 @@
 
   /* o código da OD nunca quebra de linha nas listas de itens */
   .item-lista .num{white-space:nowrap}
+
+  /* anexo que é documento (PDF ou DOCX): bloco com a extensão, no lugar da miniatura */
+  .miniatura.documento{display:flex;flex-direction:column}
+  .doc-abrir{display:grid;place-items:center;height:96px;background:var(--surface-2);
+    color:var(--text);text-decoration:none;border-bottom:1px solid var(--border)}
+  .doc-abrir span{font-size:15px;font-weight:700;letter-spacing:.04em;color:var(--primary)}
+  .doc-abrir:hover{background:var(--primary-soft)}
+  .miniatura.documento figcaption a{color:var(--primary);font-weight:600}

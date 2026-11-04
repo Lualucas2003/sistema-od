@@ -6,9 +6,24 @@
 const anexoModel = require('../models/anexoModel');
 const demandaModel = require('../models/demandaModel');
 
-const TIPOS = ['image/png', 'image/jpeg', 'image/webp', 'image/gif'];
-const LIMITE_BYTES = 3 * 1024 * 1024;   // 3 MB por imagem, já decodificada
+const TIPOS_IMAGEM = ['image/png', 'image/jpeg', 'image/webp', 'image/gif'];
+const TIPO_PDF = 'application/pdf';
+const TIPO_DOCX = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+const TIPOS_DOCUMENTO = [TIPO_PDF, TIPO_DOCX];
+const LIMITE_IMAGEM = 3 * 1024 * 1024;      // 3 MB por imagem, já decodificada
+const LIMITE_DOCUMENTO = 6 * 1024 * 1024;   // 6 MB por PDF ou DOCX
 const LIMITE_POR_DEMANDA = 8;
+
+/**
+ * O conteúdo precisa começar como o formato declarado: PDF começa com "%PDF",
+ * DOCX é um arquivo ZIP ("PK"). Evita aceitar um arquivo renomeado.
+ */
+function assinaturaValida(tipo, base64) {
+  const inicio = Buffer.from(base64.slice(0, 16), 'base64');
+  if (tipo === TIPO_PDF) return inicio.subarray(0, 4).toString('latin1') === '%PDF';
+  if (tipo === TIPO_DOCX) return inicio[0] === 0x50 && inicio[1] === 0x4b;
+  return true;
+}
 
 /** Aceita "data:image/png;base64,AAA..." ou a base64 pura. */
 function separarBase64(valor) {
@@ -34,22 +49,28 @@ exports.enviar = async (req, res, next) => {
     const tipo = req.body.tipo || tipoNoDado;
     const nome = String(req.body.nome || 'imagem').trim().slice(0, 120);
 
-    if (!base64) return res.status(422).json({ mensagem: 'Envie o conteúdo da imagem.' });
-    if (!TIPOS.includes(tipo)) {
-      return res.status(422).json({ mensagem: 'Formato não aceito. Use PNG, JPEG, WEBP ou GIF.' });
+    const ehDocumento = TIPOS_DOCUMENTO.includes(tipo);
+    if (!base64) return res.status(422).json({ mensagem: 'Envie o conteúdo do arquivo.' });
+    if (!TIPOS_IMAGEM.includes(tipo) && !ehDocumento) {
+      return res.status(422).json({ mensagem: 'Formato não aceito. Use PNG, JPEG, WEBP, GIF, PDF ou DOCX.' });
     }
     if (!/^[A-Za-z0-9+/]+={0,2}$/.test(base64)) {
-      return res.status(422).json({ mensagem: 'Conteúdo da imagem inválido.' });
+      return res.status(422).json({ mensagem: 'Conteúdo do arquivo inválido.' });
+    }
+    if (!assinaturaValida(tipo, base64)) {
+      return res.status(422).json({ mensagem: 'O conteúdo não corresponde ao formato do arquivo.' });
     }
 
     const tamanho = Buffer.byteLength(base64, 'base64');
-    if (tamanho > LIMITE_BYTES) {
-      return res.status(413).json({ mensagem: 'Imagem acima de 3 MB. Reduza antes de anexar.' });
+    const limite = ehDocumento ? LIMITE_DOCUMENTO : LIMITE_IMAGEM;
+    if (tamanho > limite) {
+      const mb = limite / (1024 * 1024);
+      return res.status(413).json({ mensagem: `Arquivo acima de ${mb} MB. Reduza antes de anexar.` });
     }
 
     const quantos = await anexoModel.contar(req.params.id);
     if (quantos >= LIMITE_POR_DEMANDA) {
-      return res.status(409).json({ mensagem: `Limite de ${LIMITE_POR_DEMANDA} imagens por demanda.` });
+      return res.status(409).json({ mensagem: `Limite de ${LIMITE_POR_DEMANDA} anexos por demanda.` });
     }
 
     const anexo = await anexoModel.criar(req.params.id, {

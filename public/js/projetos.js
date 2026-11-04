@@ -918,6 +918,7 @@ function listaRequisitos(itens, pode) {
 function linhaDoTempo(atividades) {
   if (!atividades.length) return '';
   const hoje = new Date().toLocaleDateString('sv-SE');   // AAAA-MM-DD, no fuso local
+  const proxima = atividades.find((e) => e.situacao !== 'concluida');   // a próxima a acontecer
   const itens = atividades.map((e) => {
     const s = situacaoEtapaDe(e.situacao);
     const prazo = e.prazo ? String(e.prazo).slice(0, 10) : '';
@@ -926,7 +927,7 @@ function linhaDoTempo(atividades) {
       ? `✓ ${dataBR(e.concluida_em)}`
       : (prazo ? dataBR(prazo) : 'Sem data');
     return `
-      <li class="lt-item lt-${e.situacao}" title="${esc(e.titulo)} — ${s.nome}${atrasada ? ' (atrasada)' : ''}">
+      <li class="lt-item lt-${e.situacao}${e === proxima ? ' lt-proxima' : ''}" title="${esc(e.titulo)} — ${s.nome}${atrasada ? ' (atrasada)' : ''}">
         <span class="lt-bola"></span>
         <b>${esc(e.titulo)}</b>
         <time class="${atrasada ? 'atrasada' : ''}">${esc(quando)}</time>
@@ -964,7 +965,13 @@ function ligarLinhaDoTempo(raiz, posicao = 0) {
   faixa.addEventListener('scroll', atualizar, { passive: true });
   new ResizeObserver(atualizar).observe(faixa);   // some junto com o elemento a cada redesenho
 
-  faixa.scrollLeft = posicao;
+  // a faixa abre na próxima atividade a acontecer; se tudo foi concluído, no fim
+  const alvo = faixa.querySelector('.lt-proxima');
+  if (alvo) {
+    faixa.scrollLeft += alvo.getBoundingClientRect().left - faixa.getBoundingClientRect().left;
+  } else {
+    faixa.scrollLeft = faixa.scrollWidth;
+  }
   atualizar();
 }
 
