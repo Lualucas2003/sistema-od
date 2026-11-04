@@ -2,7 +2,7 @@
  * Tela inicial: indicadores, demandas recentes e dois gráficos de apoio.
  */
 import { api } from './api.js';
-import { $, esc, etiquetaSituacao, etiquetaPrioridade, estado, tentar } from './ui.js';
+import { $, esc, canhoto, etiquetaSituacao, etiquetaPrioridade, estado, tentar } from './ui.js';
 import { desenharBarras, PALETA_GRAF, COR_SITUACAO } from './graficos.js';
 
 const MESES = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho',
@@ -34,8 +34,8 @@ export async function renderPainel(aoAbrirDemanda) {
       Nenhuma demanda registrada ainda.</td></tr>`;
   } else {
     corpo.innerHTML = recentes.map((d) => `
-      <tr data-id="${d.id}">
-        <td class="num">${esc(d.numero)}</td>
+      <tr data-id="${d.id}" data-st="${esc(d.situacao)}">
+        <td class="num">${canhoto(d.numero)}</td>
         <td class="titulo-cel"><b>${esc(d.titulo)}</b>
           <span>${esc(d.sistema)} • ${esc(d.solicitante)}</span></td>
         <td>${etiquetaPrioridade(d)}</td>

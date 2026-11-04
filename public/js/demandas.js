@@ -4,7 +4,7 @@
  */
 import { api } from './api.js';
 import {
-  $, $$, esc, estado, toast, tentar, dataBR, dataHoraBR, diasDesde,
+  $, $$, esc, canhoto, estado, toast, tentar, dataBR, dataHoraBR, diasDesde,
   etiquetaSituacao, etiquetaPrioridade, celulaAbertura, ABERTOS, preencherSelect
 } from './ui.js';
 import { htmlGaleria, ligarGaleria } from './anexos.js';
@@ -39,8 +39,8 @@ export async function renderTabela() {
                 : 'Nenhuma demanda registrada. Crie a primeira OD.'}</td></tr>`;
   } else {
     corpo.innerHTML = itens.map((d) => `
-      <tr data-id="${d.id}">
-        <td class="num">${esc(d.numero)}</td>
+      <tr data-id="${d.id}" data-st="${esc(d.situacao)}">
+        <td class="num">${canhoto(d.numero)}</td>
         <td class="titulo-cel"><b>${esc(d.titulo)}</b>${d.anexos
           ? `<i class="clipe" title="${d.anexos} imagem(ns)">📎 ${d.anexos}</i>` : ''}
           <span>${esc(String(d.descricao).slice(0, 90))}</span></td>

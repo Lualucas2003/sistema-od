@@ -53,6 +53,14 @@ export function diasDesde(iso) {
   return Math.round((hoje - d) / 86400000);
 }
 
+/** Canhoto da OD: "OD-2026-0074" vira o prefixo (OD-2026) e o número sequencial em destaque. */
+export function canhoto(numero) {
+  const texto = String(numero || '');
+  const corte = texto.lastIndexOf('-');
+  if (corte < 0) return `<span class="seq">${esc(texto)}</span>`;
+  return `<span class="prefixo">${esc(texto.slice(0, corte))}</span><span class="seq">${esc(texto.slice(corte + 1))}</span>`;
+}
+
 export function etiquetaSituacao(d) {
   const s = situacaoDe(d.situacao);
   return `<span class="tag ${s.classe}">${esc(s.nome)}</span>`;
