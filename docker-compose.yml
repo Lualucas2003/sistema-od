@@ -1,0 +1,41 @@
+# OD — Ordem de Demandas
+#
+# Uso normal (banco já existente, o do .env):
+#   docker compose up -d --build
+#
+# Com um PostgreSQL local, dentro do próprio compose:
+#   no .env, DATABASE_URL=postgres://od:od@db:5432/od?sslmode=disable
+#   docker compose --profile banco-local up -d --build
+#
+# Primeiro administrador (banco novo):
+#   docker compose exec app npm run admin -- "Nome" email@dominio senha
+
+services:
+  app:
+    build: .
+    image: sistema-od
+    env_file: .env
+    environment:
+      PORT: 4646
+      # cria as tabelas se o schema "od" estiver vazio; com tabelas já criadas, não mexe em nada
+      INICIALIZAR_BANCO: "true"
+    ports:
+      - "4646:4646"
+    # se o banco ainda estiver subindo, o container tenta de novo
+    restart: unless-stopped
+
+  db:
+    image: postgres:16-alpine
+    profiles: ["banco-local"]
+    environment:
+      POSTGRES_USER: od
+      POSTGRES_PASSWORD: od
+      POSTGRES_DB: od
+    volumes:
+      - dados-od:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+
+volumes:
+  dados-od:

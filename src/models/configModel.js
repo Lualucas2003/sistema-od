@@ -2,6 +2,7 @@
  * Model das configurações (chave/valor) e da numeração das OD.
  */
 const { consultar, consultarUm } = require('../config/db');
+const migracoes = require('../config/migracoes');
 
 const PADRAO = { org: 'HeuCode', prefixo: 'OD' };
 
@@ -29,4 +30,21 @@ async function proximoNumero() {
   return `${prefixo}-${ano}-${proximo}`;
 }
 
-module.exports = { obter, salvar, proximoNumero };
+/** Quantas tabelas o schema "od" tem — zero quer dizer banco ainda não criado. */
+async function contarTabelas() {
+  const linha = await consultarUm(
+    `select count(*)::int as total from information_schema.tables where table_schema = 'od'`);
+  return linha.total;
+}
+
+/** Cria as tabelas (db/01 a db/14). Só deve rodar com o schema vazio. */
+async function criarSchema(aoIniciar) {
+  await migracoes.aplicar(migracoes.SCHEMA, aoIniciar);
+}
+
+/** Roda db/02_seed.sql — recria o conjunto de demandas de teste. */
+async function carregarExemplos() {
+  await migracoes.aplicar([migracoes.SEED]);
+}
+
+module.exports = { obter, salvar, proximoNumero, contarTabelas, criarSchema, carregarExemplos };

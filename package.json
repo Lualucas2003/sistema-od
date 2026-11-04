@@ -6,9 +6,9 @@
   "scripts": {
     "start": "node server.js",
     "dev": "node --watch server.js",
-    "db:schema": "node scripts/aplicar-sql.js db/01_schema.sql db/03_configuracao.sql db/04_anexos.sql db/05_multiempresa.sql db/06_usuario_sistema.sql db/07_tipo_acao.sql db/08_projetos.sql db/09_catalogos_universais.sql db/10_permissoes.sql db/11_requisitos.sql db/12_atividades.sql db/13_unifica_atividades.sql db/14_usuarios_como_listas.sql",
-    "db:seed": "node scripts/aplicar-sql.js db/02_seed.sql",
-    "db:reset": "node scripts/aplicar-sql.js db/01_schema.sql db/03_configuracao.sql db/04_anexos.sql db/05_multiempresa.sql db/06_usuario_sistema.sql db/07_tipo_acao.sql db/08_projetos.sql db/09_catalogos_universais.sql db/10_permissoes.sql db/11_requisitos.sql db/12_atividades.sql db/13_unifica_atividades.sql db/14_usuarios_como_listas.sql db/02_seed.sql",
+    "db:schema": "node scripts/aplicar-sql.js --schema",
+    "db:seed": "node scripts/aplicar-sql.js --seed",
+    "db:reset": "node scripts/aplicar-sql.js --schema --seed",
     "admin": "node scripts/criar-admin.js",
     "testar": "node scripts/testar-sistema.js"
   },

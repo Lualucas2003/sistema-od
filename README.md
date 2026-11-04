@@ -29,12 +29,34 @@ npm start                 # http://localhost:4646
 | `npm run db:reset` | Estrutura + dados de teste. |
 | `npm run admin -- "Nome" email senha` | Cria (ou redefine a senha de) um administrador. |
 
+A lista de arquivos SQL e a ordem em que rodam ficam em `src/config/migracoes.js`.
+
+## Rodando com Docker
+
+```bash
+cp .env.example .env                 # preencha DATABASE_URL
+docker compose up -d --build         # http://localhost:4646
+docker compose exec app npm run admin -- "Seu Nome" voce@dominio.com suasenha
+docker compose logs -f app           # acompanhar o servidor
+```
+
+- O container lê o `.env` (a `DATABASE_URL`) e expõe a porta **4646**.
+- Com `INICIALIZAR_BANCO=true` (já ligado no compose), as tabelas são criadas sozinhas
+  quando o schema `od` está vazio. Num banco que já tem as tabelas, nada é reaplicado.
+- Para um PostgreSQL local dentro do compose, use no `.env`
+  `DATABASE_URL=postgres://od:od@db:5432/od?sslmode=disable` e suba com
+  `docker compose --profile banco-local up -d --build`. Os dados ficam no volume `dados-od`.
+- Migração nova em banco existente: `docker compose exec app node scripts/aplicar-sql.js db/<arquivo>.sql`.
+
 ## Estrutura
 
 ```
-server.js                     sobe o Express, registra rotas e confere o banco
+server.js                     confere o banco (e cria as tabelas, se pedido) e abre a porta
+Dockerfile, docker-compose.yml  imagem e serviços do Docker
 src/
+  app.js                      aplicação Express: views, estáticos, middlewares e rotas
   config/db.js                pool do PostgreSQL (consultar, consultarUm, transacao)
+  config/migracoes.js         lista e ordem dos arquivos SQL do banco
   models/                     ── M ── só SQL, sem HTTP
     demandaModel.js             CRUD, filtros, paginação, histórico
     projetoModel.js             projetos, passos de execução e documentos
@@ -85,7 +107,7 @@ public/
     painel.js  demandas.js  formulario.js  analise.js  configuracoes.js
     app.js                      navegação (por hash) e ligação dos eventos
 db/                           SQL versionado + README do banco
-scripts/aplicar-sql.js        aplica os .sql no banco do .env
+scripts/aplicar-sql.js        aplica os .sql no banco do .env (--schema, --seed ou arquivos)
 legado/                       versão anterior em arquivo único (localStorage)
 ```
 

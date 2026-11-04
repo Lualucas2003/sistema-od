@@ -413,9 +413,13 @@ async function testar() {
 
   /* ---------- projetos ---------- */
   secao('Projetos: passos, documentos e requisitos');
+  // no projeto, solicitante e responsável são contas da própria empresa
+  const listasA = (await A.gestor.get('/listas')).dados;
+  const solicitanteA = listasA.solicitantes.find((i) => i.ativo).id;
+  const responsavelA = listasA.responsaveis.find((i) => i.ativo).id;
   const pj = await A.gestor.post('/projetos', {
     nome: `${MARCA} Implantação do prontuário`, objetivo: 'Projeto criado pelo teste.',
-    sistemaId: A.sistemaIds[0], solicitanteId, responsavelId, prioridade: 'alta',
+    sistemaId: A.sistemaIds[0], solicitanteId: solicitanteA, responsavelId: responsavelA, prioridade: 'alta',
     inicioPrevisto: '2026-09-01', fimPrevisto: '2026-12-01',
     etapas: ['Levantar requisitos', 'Desenvolver módulo', 'Homologar com o cliente']
   });
