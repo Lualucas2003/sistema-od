@@ -11,6 +11,7 @@ import {
   etiquetaSituacao, etiquetaPrioridade, preencherSelect
 } from './ui.js';
 import { confirmar, perguntar } from './dialogo.js';
+import { MODOS, desenharVisao } from './projetos-visoes.js';
 
 export const SITUACOES = [
   { id: 'planejamento', nome: 'Planejamento', classe: 'st-aberta' },
@@ -162,11 +163,59 @@ export function montarFiltros() {
   });
 }
 
+/* Formas de ver a lista: lembra a última escolhida neste navegador. */
+const CHAVE_MODO = 'od.projetos.modo';
+let modo = (() => {
+  try {
+    const salvo = localStorage.getItem(CHAVE_MODO);
+    return MODOS.some((m) => m.id === salvo) ? salvo : 'tabela';
+  } catch (e) { return 'tabela'; }
+})();
+const recolhidos = new Set();            // projetos com as atividades recolhidas na tabela
+
+export function escolherModo(novo) {
+  if (!MODOS.some((m) => m.id === novo) || novo === modo) return;
+  modo = novo;
+  try { localStorage.setItem(CHAVE_MODO, modo); } catch (e) { /* sem armazenamento: vale só nesta sessão */ }
+  renderLista();
+}
+
+function marcarModos() {
+  const alvo = $('#modosProjeto');
+  if (!alvo) return;
+  if (!alvo.children.length) {
+    alvo.innerHTML = MODOS.map((m) => `<button type="button" data-modo="${m.id}"
+      title="Ver em ${esc(m.nome.toLowerCase())}"><span aria-hidden="true">${m.icone}</span> ${esc(m.nome)}</button>`).join('');
+    alvo.addEventListener('click', (ev) => {
+      const b = ev.target.closest('[data-modo]');
+      if (b) escolherModo(b.dataset.modo);
+    });
+  }
+  alvo.querySelectorAll('[data-modo]').forEach((b) => {
+    const ativo = b.dataset.modo === modo;
+    b.classList.toggle('ativo', ativo);
+    b.setAttribute('aria-pressed', String(ativo));
+  });
+}
+
+const contextoVisao = () => ({
+  SITUACOES,
+  SITUACOES_ETAPA,
+  situacao: situacaoDe,
+  situacaoEtapa: situacaoEtapaDe,
+  cartao: cartaoProjeto,
+  pode: !!estado.pode['projeto.editar'],
+  recolhidos
+});
+
 export async function renderLista() {
-  const itens = await tentar(() => api.projetos.listar(filtros));
+  marcarModos();
+  const itens = await tentar(() => api.projetos.listar(
+    modo === 'tabela' ? { ...filtros, etapas: 1 } : filtros));
   if (!itens) return;
 
   const alvo = $('#listaProjetos');
+  alvo.dataset.modo = modo;
   if (!itens.length) {
     const temFiltro = Object.values(filtros).some(Boolean);
     alvo.innerHTML = `<div class="cartao vazio"><div class="big">🗂️</div>${temFiltro
@@ -175,10 +224,43 @@ export async function renderLista() {
     return;
   }
 
-  alvo.innerHTML = `<div class="grade-projetos">${itens.map(cartaoProjeto).join('')}</div>`;
-  $$('#listaProjetos [data-projeto]').forEach((cartao) => {
+  desenharVisao(modo, itens, alvo, contextoVisao());
+  ligarVisao(alvo);
+}
+
+/** Eventos da lista: cartões abrem o projeto; a tabela recolhe, conclui e muda a situação. */
+function ligarVisao(alvo) {
+  $$('.projeto-cartao[data-projeto]', alvo).forEach((cartao) => {
     cartao.addEventListener('click', () => { location.hash = '#projeto/' + cartao.dataset.projeto; });
   });
+
+  $$('[data-recolher]', alvo).forEach((b) => b.addEventListener('click', () => {
+    const id = b.dataset.recolher;
+    const bloco = alvo.querySelector(`[data-bloco="${id}"] .vt-filhas`);
+    const fechar = !bloco.hidden;
+    bloco.hidden = fechar;
+    b.classList.toggle('aberto', !fechar);
+    if (fechar) recolhidos.add(id); else recolhidos.delete(id);
+  }));
+
+  $$('[data-vt-todos]', alvo).forEach((b) => b.addEventListener('click', () => {
+    const abrir = b.dataset.vtTodos === 'abrir';
+    $$('[data-bloco]', alvo).forEach((bloco) => {
+      const id = bloco.dataset.bloco;
+      bloco.querySelector('.vt-filhas').hidden = !abrir;
+      bloco.querySelector('.vt-seta').classList.toggle('aberto', abrir);
+      if (abrir) recolhidos.delete(id); else recolhidos.add(id);
+    });
+  }));
+
+  const mudar = async (etapaId, situacao) => {
+    const ok = await tentar(() => api.projetos.etapas.mudarSituacao(etapaId, situacao));
+    if (ok) renderLista();               // a barra e o progresso do projeto mudam junto
+  };
+  $$('[data-etapa-feita]', alvo).forEach((c) => c.addEventListener('change', () =>
+    mudar(c.dataset.etapaFeita, c.checked ? 'concluida' : 'pendente')));
+  $$('[data-etapa-status]', alvo).forEach((sel) => sel.addEventListener('change', () =>
+    mudar(sel.dataset.etapaStatus, sel.value)));
 }
 
 function cartaoProjeto(p) {

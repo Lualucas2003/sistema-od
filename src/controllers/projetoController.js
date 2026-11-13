@@ -99,13 +99,18 @@ function validar(corpo, usuario) {
 
 exports.listar = async (req, res, next) => {
   try {
-    res.json(await projetoModel.listar(req.escopo, {
+    const projetos = await projetoModel.listar(req.escopo, {
       busca: req.query.busca || '',
       situacao: req.query.situacao || '',
       prioridade: req.query.prioridade || '',
       sistema: req.query.sistema || '',
       responsavel: req.query.responsavel || ''
-    }));
+    });
+    if (req.query.etapas === '1') {       // visão em tabela: cada projeto leva seus passos
+      const etapas = await projetoModel.etapasDosProjetos(projetos.map((p) => p.id));
+      projetos.forEach((p) => { p.etapas_lista = etapas[p.id] || []; });
+    }
+    res.json(projetos);
   } catch (erro) { next(erro); }
 };
 

@@ -224,6 +224,18 @@ async function listarEtapas(projetoId) {
       where e.projeto_id = $1 order by e.ordem, e.id`, [projetoId]);
 }
 
+/** Passos de vários projetos de uma vez (visão em tabela), agrupados por projeto. */
+async function etapasDosProjetos(ids) {
+  if (!ids.length) return {};
+  const linhas = await consultar(
+    `select ${CAMPOS_ETAPA} from od.projeto_etapa e
+       left join od.responsaveis r on r.id = e.responsavel_id
+      where e.projeto_id = any($1::bigint[]) order by e.projeto_id, e.ordem, e.id`, [ids]);
+  const porProjeto = {};
+  linhas.forEach((l) => { (porProjeto[l.projeto_id] = porProjeto[l.projeto_id] || []).push(l); });
+  return porProjeto;
+}
+
 async function buscarEtapa(id) {
   return consultarUm(
     `select ${CAMPOS_ETAPA} from od.projeto_etapa e
@@ -416,7 +428,7 @@ async function paraSelecao(escopo) {
 module.exports = {
   listar, buscarPorId, buscarFicha, criar, atualizar, mudarSituacao, remover,
   registrarHistorico, sistemaPermitido, empresaDoNovoProjeto, vinculosDaEmpresa, paraSelecao,
-  listarEtapas, buscarEtapa, criarEtapa, criarEtapasEmLote, atualizarEtapa, moverEtapa,
+  listarEtapas, etapasDosProjetos, buscarEtapa, criarEtapa, criarEtapasEmLote, atualizarEtapa, moverEtapa,
   removerEtapa, projetoDaEtapa,
   listarAnexos, criarAnexo, obterConteudoAnexo, projetoDoAnexo, removerAnexo, contarAnexos
 };

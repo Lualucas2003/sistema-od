@@ -516,6 +516,103 @@
   .projeto-progresso{display:grid;grid-template-columns:1fr 40px;gap:10px;align-items:center}
   .projeto-progresso b{text-align:right;color:var(--muted);font-size:12px;font-variant-numeric:tabular-nums}
 
+  /* ---------- Projetos: formas de visualizar ---------- */
+  .modos-projeto{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+  .modos-projeto .segmentos{margin-bottom:0}
+  .modos-projeto .segmentos button span{opacity:.8;margin-right:2px}
+
+  /* cores compartilhadas (tabela, quadro, cronograma) */
+  .vt-ok{--cv:#1fae4b}.vt-roxo{--cv:#8b30e8}.vt-info{--cv:#0f9fb3}.vt-warn{--cv:#e8962a}
+  .vt-danger{--cv:#e0245e}.vt-mudo{--cv:#7a8496}.vt-rosa{--cv:#e0245e}.vt-escuro{--cv:#2b3340}
+
+  /* tabela: projeto → atividades */
+  .vt-barra-acoes{display:flex;gap:8px;justify-content:flex-end;margin-bottom:8px}
+  .vt-tabela{overflow-x:auto;padding:0}
+  .vt-linha{display:grid;grid-template-columns:minmax(300px,2.6fr) 84px 160px 170px 190px minmax(220px,1.8fr);
+    align-items:stretch;border-bottom:1px solid var(--border);min-width:1010px}
+  .vt-c{padding:0 12px;display:flex;align-items:center;min-height:46px;min-width:0;
+    border-right:1px solid var(--border)}
+  .vt-c:last-child{border-right:0}
+  .vt-cab .vt-c{justify-content:center;font-weight:600;font-size:13px;color:var(--muted);
+    background:var(--surface-2);min-height:42px}
+  .vt-cab .vt-c:first-child{justify-content:flex-start;padding-left:46px}
+  .vt-bloco{border-left:4px solid var(--rosa)}
+  .vt-bloco:last-child .vt-linha:last-child{border-bottom:0}
+  .vt-grupo{background:var(--surface)}
+  .vt-grupo:hover,.vt-filha:hover{background:var(--surface-2)}
+  .vt-nome{gap:8px}
+  .vt-sub{padding-left:38px}
+  .vt-titulo{flex:0 1 auto;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+    color:var(--text);text-decoration:none}
+  .vt-grupo .vt-titulo{font-weight:600}
+  .vt-grupo .vt-titulo:hover{color:var(--primary);text-decoration:underline}
+  .vt-titulo.feito{color:var(--muted);text-decoration:line-through}
+  .vt-conta{font-size:11.5px;color:var(--muted);background:var(--neutral-soft);border-radius:6px;
+    padding:0 7px;line-height:20px;flex:none}
+  .vt-seta{width:26px;height:26px;border:0;background:none;color:var(--muted);cursor:pointer;
+    border-radius:6px;transform:rotate(-90deg);transition:transform .15s;flex:none}
+  .vt-seta.aberto{transform:none}
+  .vt-seta:hover:not(:disabled){background:var(--neutral-soft);color:var(--text)}
+  .vt-seta:disabled{opacity:.25;cursor:default}
+  .vt-check{width:16px;height:16px;accent-color:var(--ok);flex:none;cursor:pointer}
+  .vt-tipo{font-size:10px;font-weight:700;letter-spacing:.04em;color:var(--muted);
+    border:1px solid var(--border);border-radius:5px;padding:0 5px;line-height:17px;flex:none}
+  .vt-resp{justify-content:center}
+  .vt-avatar{width:32px;height:32px;border-radius:50%;background:var(--c,#7a8496);color:#fff;flex:none;
+    display:inline-grid;place-items:center;font-size:11.5px;font-weight:700;letter-spacing:.02em}
+  .vt-atual{gap:9px;color:var(--muted);font-size:13px}
+  .vt-atual .vt-avatar{width:28px;height:28px;font-size:10.5px}
+  .vt-passos{color:var(--text);font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block;
+    line-height:46px}
+  .vt-filha .vt-passos{color:var(--muted)}
+  .vt-filhas[hidden]{display:none}
+
+  .vt-status,.vt-sel{width:100%;height:100%;min-height:46px;display:flex;align-items:center;justify-content:center;
+    background:var(--cv,#7a8496);color:#fff;font-weight:500;font-size:13.5px;text-align:center;border:0}
+  .vt-cel-status{padding:0;overflow:hidden}
+  .vt-c.vt-cel-status .vt-sel{appearance:none;-webkit-appearance:none;cursor:pointer;text-align-last:center;
+    border-radius:0;outline-offset:-3px}
+  .vt-sel:disabled{cursor:default;opacity:1}
+  .vt-sel option{background:var(--surface);color:var(--text)}
+  .vt-grupo .vt-c:nth-child(3){padding:0 12px}
+  .vt-barra{display:flex;width:100%;height:26px;border-radius:5px;overflow:hidden;background:var(--cv,#2b3340)}
+  .vt-barra i{background:var(--cv);display:block;min-width:6px}
+  .vt-grupo .vt-status{border-radius:5px;height:26px;min-height:0}
+  .vt-pilula{display:inline-flex;align-items:center;justify-content:center;width:100%;height:28px;
+    border-radius:99px;padding:0 12px;font-size:13px;font-weight:500;color:#fff;background:var(--cv,#7a8496);
+    white-space:nowrap}
+  .vt-pilula.vt-vazio{background:none;color:var(--muted)}
+
+  /* quadro por situação */
+  .vq{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(290px,1fr);gap:12px;overflow-x:auto;
+    padding-bottom:8px;align-items:start}
+  .vq-coluna{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius);padding:10px;
+    display:flex;flex-direction:column;gap:10px;min-width:0}
+  .vq-coluna header{display:flex;align-items:center;justify-content:space-between;padding:2px 2px 0}
+  .vq-coluna header b{color:var(--muted);font-size:13px}
+  .vq-lista{display:flex;flex-direction:column;gap:10px}
+  .vq-vazio{margin:6px 2px;text-align:center}
+
+  /* cronograma */
+  .vc{--vc-nome:230px;padding:0;overflow-x:auto}
+  .vc-linha{display:grid;grid-template-columns:var(--vc-nome) 1fr;border-bottom:1px solid var(--border);
+    min-width:760px;align-items:center}
+  .vc-nome{padding:0 14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13.5px;
+    color:var(--text);text-decoration:none;min-height:44px;line-height:44px;border-right:1px solid var(--border)}
+  a.vc-nome:hover{color:var(--primary)}
+  .vc-pista{position:relative;height:44px}
+  .vc-cab .vc-nome{font-weight:600;color:var(--muted);background:var(--surface-2)}
+  .vc-cab .vc-pista{background:var(--surface-2)}
+  .vc-mes{position:absolute;top:0;bottom:0;display:flex;align-items:center;justify-content:center;
+    font-size:12px;color:var(--muted);border-left:1px solid var(--border);text-transform:uppercase;letter-spacing:.04em}
+  .vc-corpo{position:relative;min-width:760px}
+  .vc-corpo .vc-linha{min-width:0}
+  .vc-hoje{position:absolute;top:0;bottom:0;width:2px;background:var(--primary);z-index:2;opacity:.8;pointer-events:none}
+  .vc-barra{position:absolute;top:9px;height:26px;border-radius:99px;background:color-mix(in srgb,var(--cv) 35%,transparent);
+    border:1px solid var(--cv);overflow:hidden;display:flex;align-items:center}
+  .vc-barra i{position:absolute;left:0;top:0;bottom:0;background:var(--cv);opacity:.9}
+  .vc-barra span{position:relative;font-size:11.5px;font-weight:600;color:#fff;padding:0 9px;white-space:nowrap}
+
   /* ---------- Projetos: perfil ---------- */
   #perfilProjeto .cabecalho-pagina h1{font-size:23px;margin-top:2px}
   #perfilProjeto .cabecalho-pagina p{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
