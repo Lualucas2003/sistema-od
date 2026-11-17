@@ -914,6 +914,7 @@ function cartaoStatus(p, pode) {
     ? `Atualizado em ${dataHoraBR(p.status_em)}${p.status_autor ? ' · ' + esc(p.status_autor) : ''}`
     : 'Ainda não registrado.';
   const vazio = '<span style="color:var(--muted)">—</span>';
+  const historico = cardsStatus(p.status_lista || []);
   if (!pode) {
     return `<div class="cartao cartao-pad status-projeto" style="margin-bottom:16px">
       <h2 class="sec">Status do projeto</h2>
@@ -922,6 +923,7 @@ function cartaoStatus(p, pode) {
         <div class="bloco-desc" style="margin-bottom:0">${p.ultima_atualizacao ? esc(p.ultima_atualizacao) : vazio}</div></div>
       <div class="campo"><label>Próximo passo</label>
         <div class="bloco-desc" style="margin-bottom:0">${p.proximo_passo ? esc(p.proximo_passo) : vazio}</div></div>
+      ${historico}
     </div>`;
   }
   return `<form class="cartao cartao-pad status-projeto" id="formStatusProjeto" style="margin-bottom:16px">
@@ -935,9 +937,30 @@ function cartaoStatus(p, pode) {
           placeholder="Qual é o próximo passo? Ex.: enviar o orçamento até sexta.">${esc(p.proximo_passo || '')}</textarea></div>
       <div class="barra-acoes">
         <button type="submit" class="btn btn-primario">Salvar status</button>
-        <span class="dica">A data e o seu nome entram junto, e o registro vai para o histórico.</span>
+        <span class="dica">Cada vez que salvar, entra um card novo no histórico de status abaixo.</span>
       </div>
+      ${historico}
     </form>`;
+}
+
+/** Histórico do status: um card por registro, do mais recente para o mais antigo. */
+function cardsStatus(lista) {
+  if (!lista.length) return '';
+  const cards = lista.map((s, i) => `
+    <article class="status-card${i === 0 ? ' atual' : ''}">
+      <header>
+        <time>${dataHoraBR(s.registrado_em)}</time>
+        ${s.autor ? `<span>· ${esc(s.autor)}</span>` : ''}
+        ${i === 0 ? '<span class="status-selo">atual</span>' : ''}
+      </header>
+      <div class="status-linha"><b>Última atualização</b>
+        <p>${s.ultima_atualizacao ? esc(s.ultima_atualizacao) : '<span class="dica">—</span>'}</p></div>
+      <div class="status-linha"><b>Próximo passo</b>
+        <p>${s.proximo_passo ? esc(s.proximo_passo) : '<span class="dica">—</span>'}</p></div>
+    </article>`).join('');
+  return `
+    <h3 class="status-hist-titulo">Histórico de status <span class="dica">(${lista.length})</span></h3>
+    <div class="status-cards">${cards}</div>`;
 }
 
 /** Leva até o status escrito e põe o cursor na última atualização. */

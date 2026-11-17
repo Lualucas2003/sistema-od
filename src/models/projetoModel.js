@@ -81,6 +81,9 @@ async function buscarPorId(escopo, id) {
   projeto.historico = await consultar(
     `select id, registrado_em, autor, texto from od.projeto_historico
       where projeto_id = $1 order by registrado_em, id`, [id]);
+  projeto.status_lista = await consultar(
+    `select id, ultima_atualizacao, proximo_passo, autor, registrado_em from od.projeto_status
+      where projeto_id = $1 order by registrado_em desc, id desc`, [id]);
   projeto.demandas_lista = await consultar(
     `select d.id, d.numero, d.titulo, d.situacao, d.prioridade, d.criada_em,
             coalesce(re.nome, 'Não atribuído') as responsavel
@@ -212,16 +215,27 @@ async function registrarHistorico(id, texto, autor) {
  */
 async function registrarStatus(escopo, id, dados, autor) {
   const vals = [id, dados.ultimaAtualizacao || null, dados.proximoPasso || null, autor || null];
-  const linha = await consultarUm(
-    `update od.projeto p set ultima_atualizacao = $2, proximo_passo = $3,
-            status_em = now(), status_autor = $4
-      where p.id = $1 ${recorte(escopo, vals)} returning p.id`, vals);
-  if (!linha) return null;
-  const partes = [];
-  if (dados.ultimaAtualizacao) partes.push(`Última atualização: ${dados.ultimaAtualizacao}`);
-  if (dados.proximoPasso) partes.push(`Próximo passo: ${dados.proximoPasso}`);
-  await registrarHistorico(id, partes.length ? partes.join(' · ') : 'Status do projeto apagado.', autor);
-  return buscarPorId(escopo, id);
+  const doEscopo = recorte(escopo, vals);
+  const salvo = await transacao(async (cliente) => {
+    // o status atual fica no projeto (é o que a tabela mostra)...
+    const { rows } = await cliente.query(
+      `update od.projeto p set ultima_atualizacao = $2, proximo_passo = $3,
+              status_em = now(), status_autor = $4
+        where p.id = $1 ${doEscopo} returning p.id`, vals);
+    if (!rows.length) return false;
+    // ...e cada registro vira um card no histórico de status
+    await cliente.query(
+      `insert into od.projeto_status (projeto_id, ultima_atualizacao, proximo_passo, autor)
+       values ($1, $2, $3, $4)`, vals.slice(0, 4));
+    const partes = [];
+    if (dados.ultimaAtualizacao) partes.push(`Última atualização: ${dados.ultimaAtualizacao}`);
+    if (dados.proximoPasso) partes.push(`Próximo passo: ${dados.proximoPasso}`);
+    await cliente.query(
+      `insert into od.projeto_historico (projeto_id, autor, texto) values ($1, $2, $3)`,
+      [id, autor || null, partes.length ? partes.join(' · ') : 'Status do projeto apagado.']);
+    return true;
+  });
+  return salvo ? buscarPorId(escopo, id) : null;
 }
 
 /** Exclui o projeto; passos, documentos e histórico vão junto (cascade). */
