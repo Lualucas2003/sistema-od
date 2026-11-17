@@ -352,13 +352,15 @@ async function rotear() {
     history.replaceState(null, '', '#od/' + id);
     return;
   }
-  // "#projeto/12" abre a tela de perfil daquele projeto
+  // "#projeto/12" abre a tela de perfil daquele projeto;
+  // "#projeto/12/status" abre já no status escrito (última atualização / próximo passo)
   if (destino.startsWith('projeto/')) {
-    const id = destino.slice(8);
+    const [id, secao] = destino.slice(8).split('/');
     lista.fecharModal();                  // veio do link "Projeto" no detalhe da OD
     await irPara('projeto');
     await projetos.abrirPerfil(id);
     history.replaceState(null, '', '#projeto/' + id);
+    if (secao === 'status') projetos.focarStatus();
     return;
   }
   const [caminho, consulta] = destino.split('?');

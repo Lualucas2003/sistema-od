@@ -68,6 +68,7 @@ export const api = {
     avancar: (id) => requisitar(`/projetos/${id}/avancar`, { method: 'POST' }),
     andamento: (id, texto) => requisitar(`/projetos/${id}/historico`,
       { method: 'POST', corpo: { texto } }),
+    status: (id, dados) => requisitar(`/projetos/${id}/status`, { method: 'PUT', corpo: dados }),
     remover: (id) => requisitar('/projetos/' + id, { method: 'DELETE' }),
 
     etapas: {

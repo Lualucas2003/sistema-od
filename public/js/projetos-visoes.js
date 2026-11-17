@@ -89,10 +89,38 @@ function pilulaEtapa(e) {
   return `<span class="vt-pilula ${atrasada ? 'vt-danger' : 'vt-escuro'}">${atrasada ? '! ' : ''}${curta(e.prazo)}</span>`;
 }
 
-/** Próximo passo do projeto: a primeira atividade ainda não concluída. */
+/** Próximo passo sugerido quando ninguém escreveu um: a primeira atividade ainda não concluída. */
 function proximoPasso(p) {
   const e = (p.etapas_lista || []).find((i) => i.situacao !== 'concluida');
   return e ? e.titulo : '';
+}
+
+const dataCurta = (iso) => {
+  const d = new Date(iso);
+  return isNaN(d) ? '' : `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
+};
+
+/** Coluna "Última atualização": a data e o texto escrito; sem texto, só há quanto tempo mexeram. */
+function celulaUltimaAtualizacao(p) {
+  if (!p.status_em) {
+    return `<a href="#projeto/${p.id}/status" class="vt-c vt-atual" title="Escrever a última atualização">
+      ${avatar(p.responsavel)}<span>${haQuanto(p.atualizado_em)}</span></a>`;
+  }
+  const dica = `${dataCurta(p.status_em)}${p.status_autor ? ' · ' + p.status_autor : ''}`
+    + (p.ultima_atualizacao ? `\n${p.ultima_atualizacao}` : '');
+  return `<a href="#projeto/${p.id}/status" class="vt-c vt-status-texto" title="${esc(dica)}">
+      <b>${dataCurta(p.status_em)}</b>
+      <span>${esc(p.ultima_atualizacao || '—')}</span></a>`;
+}
+
+/** Coluna "Próximos passos": o que foi escrito; sem texto, a próxima atividade (em cinza). */
+function celulaProximoPasso(p) {
+  if (p.proximo_passo) {
+    return `<a href="#projeto/${p.id}/status" class="vt-c vt-passos" title="${esc(p.proximo_passo)}">${esc(p.proximo_passo)}</a>`;
+  }
+  const sugestao = proximoPasso(p);
+  return `<a href="#projeto/${p.id}/status" class="vt-c vt-passos vt-sugestao"
+      title="${esc(sugestao ? 'Próxima atividade: ' + sugestao : 'Escrever o próximo passo')}">${esc(sugestao)}</a>`;
 }
 
 function linhaProjeto(p, ctx, aberto) {
@@ -108,8 +136,8 @@ function linhaProjeto(p, ctx, aberto) {
       <div class="vt-c vt-resp">${avatar(p.responsavel)}</div>
       <div class="vt-c">${barraStatus(p)}</div>
       <div class="vt-c">${pilulaProjeto(p)}</div>
-      <div class="vt-c vt-atual">${avatar(p.responsavel)}<span>${haQuanto(p.atualizado_em)}</span></div>
-      <div class="vt-c vt-passos" title="${esc(proximoPasso(p))}">${esc(proximoPasso(p))}</div>
+      ${celulaUltimaAtualizacao(p)}
+      ${celulaProximoPasso(p)}
     </div>`;
 }
 

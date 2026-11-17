@@ -30,6 +30,7 @@
  *  PATCH  /api/projetos/:id/situacao    muda a situação
  *  POST   /api/projetos/:id/avancar     vai para a próxima etapa do projeto
  *  POST   /api/projetos/:id/historico   registra andamento
+ *  PUT    /api/projetos/:id/status      última atualização + próximo passo (texto livre)
  *  DELETE /api/projetos/:id             exclui (as demandas ficam, sem o vínculo)
  *
  *  GET/POST /api/projetos/:id/etapas       passos de execução
@@ -112,6 +113,7 @@ rotas.put('/projetos/:id', exigir('projeto.editar'), projetos.atualizar);
 rotas.patch('/projetos/:id/situacao', exigir('projeto.editar'), projetos.mudarSituacao);
 rotas.post('/projetos/:id/avancar', exigir('projeto.editar'), projetos.avancar);
 rotas.post('/projetos/:id/historico', exigir('projeto.criar'), projetos.registrarAndamento);
+rotas.put('/projetos/:id/status', exigir('projeto.editar'), projetos.registrarStatus);
 rotas.delete('/projetos/:id', exigir('projeto.excluir'), projetos.remover);
 
 rotas.post('/projetos/:id/etapas/importar', exigir('projeto.criar'), projetos.importarEtapas);

@@ -783,6 +783,8 @@ function renderPerfil(p) {
 
     <div class="grade-2">
       <div>
+        ${cartaoStatus(p, !!pode['projeto.editar'])}
+
         <div class="cartao cartao-pad" style="margin-bottom:16px">
           <h2 class="sec">Objetivo do projeto</h2>
           <div class="bloco-desc" style="margin-bottom:0">${p.objetivo
@@ -901,6 +903,50 @@ function renderPerfil(p) {
   ligarLinhaDoTempo(raiz, posicaoLinha);
   alinharHistorico(raiz);
   ligarPerfil(p);
+}
+
+/**
+ * Status escrito do projeto: o que aconteceu por último e qual é o próximo passo.
+ * É o texto que aparece nas colunas "Última atualização" e "Próximos passos" da tabela.
+ */
+function cartaoStatus(p, pode) {
+  const quando = p.status_em
+    ? `Atualizado em ${dataHoraBR(p.status_em)}${p.status_autor ? ' · ' + esc(p.status_autor) : ''}`
+    : 'Ainda não registrado.';
+  const vazio = '<span style="color:var(--muted)">—</span>';
+  if (!pode) {
+    return `<div class="cartao cartao-pad status-projeto" style="margin-bottom:16px">
+      <h2 class="sec">Status do projeto</h2>
+      <div class="status-quando">${quando}</div>
+      <div class="campo"><label>Última atualização</label>
+        <div class="bloco-desc" style="margin-bottom:0">${p.ultima_atualizacao ? esc(p.ultima_atualizacao) : vazio}</div></div>
+      <div class="campo"><label>Próximo passo</label>
+        <div class="bloco-desc" style="margin-bottom:0">${p.proximo_passo ? esc(p.proximo_passo) : vazio}</div></div>
+    </div>`;
+  }
+  return `<form class="cartao cartao-pad status-projeto" id="formStatusProjeto" style="margin-bottom:16px">
+      <h2 class="sec">Status do projeto</h2>
+      <div class="status-quando">${quando}</div>
+      <div class="campo"><label for="stUltima">Última atualização</label>
+        <textarea id="stUltima" maxlength="1000"
+          placeholder="O que aconteceu por último? Ex.: reunião com o cliente, validamos as telas.">${esc(p.ultima_atualizacao || '')}</textarea></div>
+      <div class="campo"><label for="stProximo">Próximo passo</label>
+        <textarea id="stProximo" maxlength="1000"
+          placeholder="Qual é o próximo passo? Ex.: enviar o orçamento até sexta.">${esc(p.proximo_passo || '')}</textarea></div>
+      <div class="barra-acoes">
+        <button type="submit" class="btn btn-primario">Salvar status</button>
+        <span class="dica">A data e o seu nome entram junto, e o registro vai para o histórico.</span>
+      </div>
+    </form>`;
+}
+
+/** Leva até o status escrito e põe o cursor na última atualização. */
+export function focarStatus() {
+  const cartao = $('#perfilProjeto .status-projeto');
+  if (!cartao) return;
+  cartao.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  const campo = $('#stUltima');
+  if (campo) campo.focus({ preventScroll: true });
 }
 
 /** A Ficha só aparece quando há algo além do cadastro para mostrar. */
@@ -1096,6 +1142,17 @@ function ligarPerfil(p) {
   };
 
   ligar('#btnVoltarProjetos', 'click', () => { location.hash = '#projetos'; });
+
+  ligar('#formStatusProjeto', 'submit', async (e) => {
+    e.preventDefault();
+    const dados = { ultimaAtualizacao: $('#stUltima').value.trim(), proximoPasso: $('#stProximo').value.trim() };
+    if (dados.ultimaAtualizacao === (p.ultima_atualizacao || '')
+        && dados.proximoPasso === (p.proximo_passo || '')) {
+      return toast('Nada mudou no status.', 'erro');
+    }
+    const salvo = await tentar(() => api.projetos.status(p.id, dados));
+    if (salvo) { toast('Status do projeto salvo.'); renderPerfil(salvo); }
+  });
 
   ligar('#btnEditarProjeto', 'click', () => {
     preencherForm(p);

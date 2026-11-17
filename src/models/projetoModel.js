@@ -50,6 +50,8 @@ async function listar(escopo, filtros = {}) {
     vals.push('%' + filtros.busca + '%');
     cond.push(`(p.codigo ilike $${vals.length} or p.nome ilike $${vals.length}
                 or coalesce(p.objetivo,'') ilike $${vals.length}
+                or coalesce(p.ultima_atualizacao,'') ilike $${vals.length}
+                or coalesce(p.proximo_passo,'') ilike $${vals.length}
                 or coalesce(p.sistema,'') ilike $${vals.length}
                 or p.responsavel ilike $${vals.length})`);
   }
@@ -202,6 +204,24 @@ async function registrarHistorico(id, texto, autor) {
   return consultarUm(
     `insert into od.projeto_historico (projeto_id, autor, texto) values ($1, $2, $3)
      returning id, registrado_em, autor, texto`, [id, autor || null, texto]);
+}
+
+/**
+ * Grava o status escrito (última atualização + próximo passo), com data e autor,
+ * e deixa o registro no histórico. Devolve null se o projeto não é do escopo.
+ */
+async function registrarStatus(escopo, id, dados, autor) {
+  const vals = [id, dados.ultimaAtualizacao || null, dados.proximoPasso || null, autor || null];
+  const linha = await consultarUm(
+    `update od.projeto p set ultima_atualizacao = $2, proximo_passo = $3,
+            status_em = now(), status_autor = $4
+      where p.id = $1 ${recorte(escopo, vals)} returning p.id`, vals);
+  if (!linha) return null;
+  const partes = [];
+  if (dados.ultimaAtualizacao) partes.push(`Última atualização: ${dados.ultimaAtualizacao}`);
+  if (dados.proximoPasso) partes.push(`Próximo passo: ${dados.proximoPasso}`);
+  await registrarHistorico(id, partes.length ? partes.join(' · ') : 'Status do projeto apagado.', autor);
+  return buscarPorId(escopo, id);
 }
 
 /** Exclui o projeto; passos, documentos e histórico vão junto (cascade). */
@@ -427,7 +447,7 @@ async function paraSelecao(escopo) {
 
 module.exports = {
   listar, buscarPorId, buscarFicha, criar, atualizar, mudarSituacao, remover,
-  registrarHistorico, sistemaPermitido, empresaDoNovoProjeto, vinculosDaEmpresa, paraSelecao,
+  registrarHistorico, registrarStatus, sistemaPermitido, empresaDoNovoProjeto, vinculosDaEmpresa, paraSelecao,
   listarEtapas, etapasDosProjetos, buscarEtapa, criarEtapa, criarEtapasEmLote, atualizarEtapa, moverEtapa,
   removerEtapa, projetoDaEtapa,
   listarAnexos, criarAnexo, obterConteudoAnexo, projetoDoAnexo, removerAnexo, contarAnexos

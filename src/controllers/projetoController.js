@@ -206,6 +206,21 @@ exports.registrarAndamento = async (req, res, next) => {
   } catch (erro) { next(erro); }
 };
 
+/** Status escrito: o que aconteceu por último e qual é o próximo passo (texto livre). */
+exports.registrarStatus = async (req, res, next) => {
+  try {
+    const ultimaAtualizacao = String(req.body.ultimaAtualizacao || '').trim();
+    const proximoPasso = String(req.body.proximoPasso || '').trim();
+    if (ultimaAtualizacao.length > 1000 || proximoPasso.length > 1000) {
+      return res.status(422).json({ mensagem: 'Use no máximo 1000 caracteres em cada campo.' });
+    }
+    const projeto = await projetoModel.registrarStatus(req.escopo, req.params.id,
+      { ultimaAtualizacao, proximoPasso }, req.usuario ? req.usuario.nome : null);
+    if (!projeto) return res.status(404).json({ mensagem: 'Projeto não encontrado.' });
+    res.json(projeto);
+  } catch (erro) { next(erro); }
+};
+
 exports.remover = async (req, res, next) => {
   try {
     const saida = await projetoModel.remover(req.escopo, req.params.id);
