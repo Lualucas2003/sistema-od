@@ -58,9 +58,12 @@ const COR_ETAPA = { pendente: 'mudo', andamento: 'warn', concluida: 'ok', bloque
 
 /* ------------------------------- Tabela ------------------------------- */
 
-/** Barra do projeto: um trecho para cada situação dos seus itens (como no print). */
+/** Só as atividades do projeto: os requisitos (RF/RNF) ficam na ficha, não na lista. */
+const atividadesDo = (p) => (p.etapas_lista || []).filter((e) => e.tipo !== 'requisito');
+
+/** Barra do projeto: um trecho para cada situação das suas atividades (como no print). */
 function barraStatus(p) {
-  const lista = p.etapas_lista || [];
+  const lista = atividadesDo(p);
   if (!lista.length) {
     return `<span class="vt-status vt-${COR_SITUACAO[p.situacao] || 'mudo'}">${esc(p.situacaoNome)}</span>`;
   }
@@ -91,7 +94,7 @@ function pilulaEtapa(e) {
 
 /** Próximo passo sugerido quando ninguém escreveu um: a primeira atividade ainda não concluída. */
 function proximoPasso(p) {
-  const e = (p.etapas_lista || []).find((i) => i.situacao !== 'concluida');
+  const e = atividadesDo(p).find((i) => i.situacao !== 'concluida');
   return e ? e.titulo : '';
 }
 
@@ -124,14 +127,15 @@ function celulaProximoPasso(p) {
 }
 
 function linhaProjeto(p, ctx, aberto) {
-  const lista = p.etapas_lista || [];
+  const lista = atividadesDo(p);
+  const feitas = lista.filter((e) => e.situacao === 'concluida').length;
   return `
     <div class="vt-linha vt-grupo" data-projeto="${p.id}">
       <div class="vt-c vt-nome">
         <button type="button" class="vt-seta ${aberto ? 'aberto' : ''}" data-recolher="${p.id}"
                 aria-label="${aberto ? 'Recolher' : 'Expandir'} atividades" ${lista.length ? '' : 'disabled'}>▾</button>
         <a href="#projeto/${p.id}" class="vt-titulo" title="${esc(p.codigo)} — ${esc(p.nome)}">${esc(p.nome)}</a>
-        ${lista.length ? `<span class="vt-conta" title="${p.etapas_concluidas} de ${p.etapas} concluídos">${lista.length}</span>` : ''}
+        ${lista.length ? `<span class="vt-conta" title="${feitas} de ${lista.length} concluídas">${lista.length}</span>` : ''}
       </div>
       <div class="vt-c vt-resp">${avatar(p.responsavel)}</div>
       <div class="vt-c">${barraStatus(p)}</div>
@@ -175,7 +179,7 @@ function tabela(itens, ctx) {
     const aberto = !recolhidos.has(String(p.id));
     return `<div class="vt-bloco" data-bloco="${p.id}">
       ${linhaProjeto(p, ctx, aberto)}
-      <div class="vt-filhas" ${aberto ? '' : 'hidden'}>${(p.etapas_lista || []).map((e) => linhaEtapa(e, ctx)).join('')}</div>
+      <div class="vt-filhas" ${aberto ? '' : 'hidden'}>${atividadesDo(p).map((e) => linhaEtapa(e, ctx)).join('')}</div>
     </div>`;
   }).join('');
   return `

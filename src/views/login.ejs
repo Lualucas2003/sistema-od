@@ -6,18 +6,33 @@
 <title><%= titulo %></title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700;800&display=swap">
 <link rel="stylesheet" href="/css/od.css?v=<%= versao %>">
 </head>
 <body class="tela-entrada">
 
 <main class="entrada">
-  <div class="entrada-caixa">
-    <div class="entrada-marca">
+  <aside class="entrada-painel">
+    <div class="entrada-logo">
       <div class="mark">&lt;/&gt;</div>
       <strong><span class="texto-grad">OD</span> · Ordem de Demandas</strong>
-      <small><%= portal ? portal.nome : 'HeuCode' %></small>
     </div>
+    <div class="entrada-texto">
+      <h1>Toda demanda, do pedido à entrega.</h1>
+      <p>Registre, priorize e acompanhe as ordens de demanda da sua equipe em um só lugar.</p>
+    </div>
+    <ul class="entrada-ficha" aria-hidden="true">
+      <li><span>OD-0128</span><i class="tag st-andamento">Em andamento</i></li>
+      <li><span>OD-0127</span><i class="tag st-aguardando">Aguardando</i></li>
+      <li><span>OD-0126</span><i class="tag st-concluida">Concluída</i></li>
+    </ul>
+  </aside>
+
+  <section class="entrada-caixa">
+    <header class="entrada-marca">
+      <h2>Entrar</h2>
+      <small><%= portal ? 'Portal ' + portal.nome : 'HeuCode' %></small>
+    </header>
 
     <% if (portal) { %>
       <p class="entrada-nota">Portal exclusivo de <b><%= portal.nome %></b>.
@@ -25,7 +40,7 @@
     <% } %>
 
     <% if (erro) { %>
-      <div class="entrada-erro"><span>⚠</span><%= erro %></div>
+      <div class="entrada-erro" role="alert"><span>⚠</span><%= erro %></div>
     <% } %>
 
     <form method="post" action="<%= portal ? '/p/' + portal.slug + '/entrar' : '/entrar' %>">
@@ -50,9 +65,7 @@
         Acesso restrito à administração do sistema.
       <% } %>
     </p>
-  </div>
-
-  <p class="entrada-assinatura">HeuCode · Ordem de Demandas</p>
+  </section>
 </main>
 
 </body>
